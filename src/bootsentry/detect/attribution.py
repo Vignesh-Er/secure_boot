@@ -46,16 +46,30 @@ class AttributionEngine:
     def __init__(self):
         self.medians: dict[str, float] = {}
         self.mads: dict[str, float] = {}
+        self.scales: dict[str, float] = {}
 
     def fit(self, records: list[BootRecord]) -> AttributionEngine:
-        """Calculate median and MAD for all 28 continuous features from normal baseline boots."""
+        """Calculate median, MAD, and robust dispersion scale for all 28 continuous features."""
         X = extract_feature_matrix(records)
         for i, name in enumerate(FEATURE_NAMES):
             col = X[:, i]
             med = float(np.median(col))
             mad = float(np.median(np.abs(col - med)))
             self.medians[name] = med
-            self.mads[name] = max(1e-4, mad)
+            self.mads[name] = mad
+
+            if mad > 1e-6:
+                # Standard normal-consistent MAD scale
+                scale = 1.4826 * mad
+            else:
+                # When MAD == 0 (>50% identical values), fallback to L1 mean absolute deviation
+                l1_dev = float(np.mean(np.abs(col - med)))
+                if l1_dev > 1e-6:
+                    scale = 1.2533 * l1_dev
+                else:
+                    std = float(np.std(col))
+                    scale = std if std > 1e-6 else max(1.0, abs(med) * 0.1)
+            self.scales[name] = scale
         return self
 
     def explain(self, record: BootRecord, top_k: int = 3) -> list[FeatureAttribution]:
@@ -64,12 +78,20 @@ class AttributionEngine:
         attributions: list[FeatureAttribution] = []
 
         for name in FEATURE_NAMES:
-            obs = feat_dict[name]
+            obs = float(feat_dict.get(name, 0.0))
             med = self.medians.get(name, 0.0)
-            mad = self.mads.get(name, 1.0)
-            # 1.4826 * MAD normalizes MAD to standard deviation of a Gaussian distribution
-            scale = 1.4826 * mad + 1e-4
-            z = (obs - med) / scale
+            mad = self.mads.get(name, 0.0)
+            scale = self.scales.get(name, 1.4826 * mad if mad > 1e-6 else max(1.0, abs(med) * 0.1))
+
+            # Numerical safety checks
+            if not np.isfinite(obs) or abs(obs - med) < 1e-12:
+                z = 0.0
+            else:
+                z = (obs - med) / scale
+                if not np.isfinite(z):
+                    z = 0.0
+
+
             attributions.append(
                 FeatureAttribution(
                     feature_name=name,
@@ -90,6 +112,7 @@ class AttributionEngine:
         bundle = {
             "medians": self.medians,
             "mads": self.mads,
+            "scales": self.scales,
         }
         joblib.dump(bundle, path)
 
@@ -101,6 +124,13 @@ class AttributionEngine:
 
         bundle = joblib.load(path)
         engine = cls()
-        engine.medians = bundle["medians"]
-        engine.mads = bundle["mads"]
+        engine.medians = bundle.get("medians", {})
+        engine.mads = bundle.get("mads", {})
+        engine.scales = bundle.get("scales", {})
+        # Backwards compatibility if scales was not previously serialized
+        if not engine.scales:
+            for name, mad in engine.mads.items():
+                med = engine.medians.get(name, 0.0)
+                engine.scales[name] = 1.4826 * mad if mad > 1e-6 else max(1.0, abs(med) * 0.1)
         return engine
+

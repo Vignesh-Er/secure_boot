@@ -156,6 +156,48 @@ class TestAttributionEngine:
         assert "+" in top_attrs[0].formatted_sigma
         assert "sigma" in top_attrs[0].formatted_sigma
 
+    def test_numerical_stability_and_zero_mad_cases(self, normal_training_records, tmp_path):
+        """Regression test verifying robust-z calculation under edge cases and zero-MAD features."""
+        engine = AttributionEngine()
+        engine.fit(normal_training_records)
+
+        # 1. Normal record
+        normal_attrs = engine.explain(normal_training_records[0], top_k=28)
+        for a in normal_attrs:
+            assert np.isfinite(a.robust_z)
+            assert np.isfinite(a.observed_value)
+            assert np.isfinite(a.baseline_median)
+            assert np.isfinite(a.baseline_mad)
+            assert not np.isnan(a.robust_z)
+
+        # 2. Extreme anomalous record with zero-MAD features, large values, and negative values
+        extreme_rec = BootRecord(
+            boot_id="test-extreme",
+            timestamp_iso="2026-08-17T08:00:00Z",
+            total_boot_time_ms=100000.0,
+            stages={
+                "S0": StageTelemetry("S0", t_verify_ms=0.0, t_exec_ms=-1.0, rss_mb=500.0, io_bytes_read=1024 * 1024),
+                "S1": StageTelemetry("S1", t_verify_ms=500.0, t_exec_ms=500.0, rss_mb=1000.0, io_bytes_written=0),
+                "S2": StageTelemetry("S2", t_verify_ms=1000.0, t_exec_ms=5000.0, rss_mb=2000.0, ctx_switches_vol=10000),
+                "S3": StageTelemetry("S3", t_verify_ms=0.0, t_exec_ms=10000.0, rss_mb=4000.0, page_faults_major=50),
+            },
+        )
+
+        extreme_attrs = engine.explain(extreme_rec, top_k=28)
+        for a in extreme_attrs:
+            assert np.isfinite(a.robust_z)
+            assert not np.isnan(a.robust_z)
+            assert not np.isinf(a.robust_z)
+
+        # 3. Serialization and deserialization roundtrip
+        save_file = tmp_path / "attr_engine.joblib"
+        engine.save(save_file)
+        loaded = AttributionEngine.load(save_file)
+        loaded_attrs = loaded.explain(extreme_rec, top_k=5)
+        assert len(loaded_attrs) == 5
+        assert loaded_attrs[0].robust_z == pytest.approx(extreme_attrs[0].robust_z, rel=1e-3)
+
+
 
 class TestBaselines:
     def test_ocsvm_and_lof(self, normal_training_records):

@@ -1,0 +1,210 @@
+{
+  "A1: Signed Downgrade": [
+    {
+      "feature_name": "t_verify_s0",
+      "observed_value": 0.0,
+      "baseline_median": 21.0859,
+      "baseline_mad": 0.19335000000000058,
+      "robust_z": -73.55699356217997,
+      "formatted_sigma": "-73.6sigma"
+    },
+    {
+      "feature_name": "t_verify_s2",
+      "observed_value": 0.0,
+      "baseline_median": 21.03475,
+      "baseline_mad": 0.2135499999999979,
+      "robust_z": -66.4375766935165,
+      "formatted_sigma": "-66.4sigma"
+    },
+    {
+      "feature_name": "t_verify_s1",
+      "observed_value": 0.0,
+      "baseline_median": 21.15305,
+      "baseline_mad": 0.21729999999999983,
+      "robust_z": -65.6582455579678,
+      "formatted_sigma": "-65.7sigma"
+    }
+  ],
+  "A2: TOCTOU Config Swap": [
+    {
+      "feature_name": "io_bytes_read_kb",
+      "observed_value": 80.0,
+      "baseline_median": 0.0,
+      "baseline_mad": 0.0,
+      "robust_z": 80.0,
+      "formatted_sigma": "+80.0sigma"
+    },
+    {
+      "feature_name": "ctx_switches_vol",
+      "observed_value": 45.0,
+      "baseline_median": 0.0,
+      "baseline_mad": 0.0,
+      "robust_z": 45.0,
+      "formatted_sigma": "+45.0sigma"
+    },
+    {
+      "feature_name": "t_verify_s1",
+      "observed_value": 35.5856,
+      "baseline_median": 21.15305,
+      "baseline_mad": 0.21729999999999983,
+      "robust_z": 44.79807460047833,
+      "formatted_sigma": "+44.8sigma"
+    }
+  ],
+  "A3: Service Reorder": [
+    {
+      "feature_name": "t_verify_s0",
+      "observed_value": 5.0,
+      "baseline_median": 21.0859,
+      "baseline_mad": 0.19335000000000058,
+      "robust_z": -56.11477066389723,
+      "formatted_sigma": "-56.1sigma"
+    },
+    {
+      "feature_name": "t_verify_s1",
+      "observed_value": 10.0,
+      "baseline_median": 21.15305,
+      "baseline_mad": 0.21729999999999983,
+      "robust_z": -34.618633985183834,
+      "formatted_sigma": "-34.6sigma"
+    },
+    {
+      "feature_name": "t_verify_s2",
+      "observed_value": 15.0,
+      "baseline_median": 21.03475,
+      "baseline_mad": 0.2135499999999979,
+      "robust_z": -19.06056244791113,
+      "formatted_sigma": "-19.1sigma"
+    }
+  ],
+  "A4: Slow-Drip Drift (Boot 20)": [
+    {
+      "feature_name": "t_verify_s0",
+      "observed_value": 5.0,
+      "baseline_median": 21.0859,
+      "baseline_mad": 0.19335000000000058,
+      "robust_z": -56.11477066389723,
+      "formatted_sigma": "-56.1sigma"
+    },
+    {
+      "feature_name": "t_exec_s2",
+      "observed_value": 91.0,
+      "baseline_median": 17.887999999999998,
+      "baseline_mad": 1.2366499999999991,
+      "robust_z": 39.87657656317702,
+      "formatted_sigma": "+39.9sigma"
+    },
+    {
+      "feature_name": "t_verify_s1",
+      "observed_value": 10.0,
+      "baseline_median": 21.15305,
+      "baseline_mad": 0.21729999999999983,
+      "robust_z": -34.618633985183834,
+      "formatted_sigma": "-34.6sigma"
+    }
+  ],
+  "A5: Cross-SKU (Held-Out)": [
+    {
+      "feature_name": "io_read_write_ratio",
+      "observed_value": 32000.999999999996,
+      "baseline_median": 1.0,
+      "baseline_mad": 0.0,
+      "robust_z": 31999.999999999996,
+      "formatted_sigma": "+32000.0sigma"
+    },
+    {
+      "feature_name": "t_verify_s0",
+      "observed_value": 5.0,
+      "baseline_median": 21.0859,
+      "baseline_mad": 0.19335000000000058,
+      "robust_z": -56.11477066389723,
+      "formatted_sigma": "-56.1sigma"
+    },
+    {
+      "feature_name": "t_verify_s1",
+      "observed_value": 10.0,
+      "baseline_median": 21.15305,
+      "baseline_mad": 0.21729999999999983,
+      "robust_z": -34.618633985183834,
+      "formatted_sigma": "-34.6sigma"
+    }
+  ],
+  "B1: Benign Cold Cache": [
+    {
+      "feature_name": "io_read_write_ratio",
+      "observed_value": 32000.999999999996,
+      "baseline_median": 1.0,
+      "baseline_mad": 0.0,
+      "robust_z": 31999.999999999996,
+      "formatted_sigma": "+32000.0sigma"
+    },
+    {
+      "feature_name": "t_verify_s0",
+      "observed_value": 6.2,
+      "baseline_median": 21.0859,
+      "baseline_mad": 0.19335000000000058,
+      "robust_z": -51.92863716830938,
+      "formatted_sigma": "-51.9sigma"
+    },
+    {
+      "feature_name": "io_bytes_read_kb",
+      "observed_value": 32.0,
+      "baseline_median": 0.0,
+      "baseline_mad": 0.0,
+      "robust_z": 32.0,
+      "formatted_sigma": "+32.0sigma"
+    }
+  ],
+  "B2: Benign Firmware Upgrade": [
+    {
+      "feature_name": "t_verify_s0",
+      "observed_value": 5.0,
+      "baseline_median": 21.0859,
+      "baseline_mad": 0.19335000000000058,
+      "robust_z": -56.11477066389723,
+      "formatted_sigma": "-56.1sigma"
+    },
+    {
+      "feature_name": "t_verify_s1",
+      "observed_value": 10.0,
+      "baseline_median": 21.15305,
+      "baseline_mad": 0.21729999999999983,
+      "robust_z": -34.618633985183834,
+      "formatted_sigma": "-34.6sigma"
+    },
+    {
+      "feature_name": "t_verify_s2",
+      "observed_value": 15.0,
+      "baseline_median": 21.03475,
+      "baseline_mad": 0.2135499999999979,
+      "robust_z": -19.06056244791113,
+      "formatted_sigma": "-19.1sigma"
+    }
+  ],
+  "B3: Benign CPU Load": [
+    {
+      "feature_name": "ctx_switches_invol",
+      "observed_value": 99.0,
+      "baseline_median": 0.0,
+      "baseline_mad": 0.0,
+      "robust_z": 99.0,
+      "formatted_sigma": "+99.0sigma"
+    },
+    {
+      "feature_name": "t_verify_s0",
+      "observed_value": 7.5,
+      "baseline_median": 21.0859,
+      "baseline_mad": 0.19335000000000058,
+      "robust_z": -47.39365921475587,
+      "formatted_sigma": "-47.4sigma"
+    },
+    {
+      "feature_name": "t_verify_s1",
+      "observed_value": 15.0,
+      "baseline_median": 21.15305,
+      "baseline_mad": 0.21729999999999983,
+      "robust_z": -19.098828198791846,
+      "formatted_sigma": "-19.1sigma"
+    }
+  ]
+}

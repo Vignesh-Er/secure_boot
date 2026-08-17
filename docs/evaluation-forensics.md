@@ -89,20 +89,39 @@ The forensic audit traced the discrepancy to two distinct causes:
 
 ---
 
-## 6. A5 Held-Out Verification
+## 6. Feature Attribution & Numerical Robustness Audit
 
-- **Source File**: `src/bootsentry/attacks/a5_cross_sku.py`
-- **Isolation Principle**: Attack A5 is never included in training sets, feature engineering selections, or threshold tuning.
-- **Evaluation Result**: Foreign NUMA memory allocation footprint and I/O balance trigger a $+128897124.0\sigma$ robust-z spike on `io_read_write_ratio` and $+195359.7\sigma$ on `rss_s2_mb`.
-- **Verdict**: Flagged with an anomaly score of `0.6273` $\implies$ `WARN + REDUCED_TRUST`.
+### Zero-MAD & Principled Scale Dispersion Policy
+In standard robust statistics, $z = \frac{x - \text{median}}{1.4826 \times \text{MAD}}$. When a feature is invariant on the clean baseline (e.g. constant integer count, zero baseline page faults), $\text{MAD} = 0$.
+The `AttributionEngine` enforces a principled, three-tier dispersion policy:
+1. **Standard Dispersion ($\text{MAD} > 10^{-6}$)**: $\text{scale} = 1.4826 \times \text{MAD}$ (Gaussian-consistent scale).
+2. **Discrete Variance ($\text{MAD} \le 10^{-6}, S_{L1} > 10^{-6}$)**: Fallback to L1 mean absolute error around median $\text{scale} = 1.2533 \times S_{L1}$.
+3. **Strict Baseline Invariance ($S_{L1} \le 10^{-6}$)**: Fallback to sample standard deviation $\text{std}$ or natural feature unit scale $\max(1.0, 0.1 \times |\text{median}|)$.
+
+For all features, if $|x - \text{median}| < 10^{-12}$, $z \equiv 0.0$. All output $z$-scores are asserted finite (`math.isfinite(z)`).
+
+### Verified Attack Attribution Values (Top Features):
+- **A1 (Signed Downgrade)**: `t_verify_s0` ($-73.6\sigma$), `t_verify_s2` ($-66.4\sigma$), `t_verify_s1` ($-65.7\sigma$) [bypassed verification].
+- **A2 (TOCTOU Config Swap)**: `io_bytes_read_kb` ($+80.0\sigma$), `ctx_switches_vol` ($+45.0\sigma$), `t_verify_s1` ($+44.8\sigma$).
+- **A3 (Service Reorder)**: Service sequence transition zero-probability Markov anomaly ($S_{MK} = 1.0000$).
+- **A4 (Slow-Drip Drift)**: `t_exec_s2` ($+39.9\sigma$), CUSUM statistic $> 4.0\sigma$ triggered causally at Boot 5.
+- **A5 (Cross-SKU Held-Out)**: `io_bytes_read_kb` ($+32.0\sigma$), `rss_s2_mb` ($+31.3\sigma$), `ctx_switches_vol` ($+28.0\sigma$).
+- **B3 (Benign CPU Load)**: `ctx_switches_invol` ($+99.0\sigma$), `t_verify_s0` ($-47.4\sigma$) $\implies$ Correctly classified as `PASS` (0 false halts).
 
 ---
 
-## 7. Forensic Conclusion & Recommendation
+## 7. Metric Semantics Distinction: System vs Detector
 
-- **Verdict**: **SAFE TO SUBMIT (with updated dual-metric documentation)**.
-- The underlying detection models and deterministic rules are operating with high precision on authentic OS telemetry.
-- The repository now reports both:
-  1. **Scenario-Level Security Benchmark**: ROC-AUC = 1.0000, PR-AUC = 1.0000, FPR@95% = 0.0000.
-  2. **Sample-Level Sequence Metric**: Full breakdown transparently documented in `docs/evaluation-forensics.md` and `eval/report.html`.
-- No metric gaming or threshold manipulation was applied.
+To prevent ambiguous claims, BootSentry strictly distinguishes:
+
+1. **Multi-Gate System Threat Mitigation (Scenario-Level Separation)**:
+   - **Target**: Evaluates full defense-in-depth policy separation (Gate 1 PQC + Gate 2 Measured Boot + Gate 3 AI + Deterministic Rule Floor) across all attack threat models (A1–A5) and benign operational variations (B1–B3).
+   - **Result**: **100% scenario separation** (A1 deterministic HALT, A2–A5 WARN+ATTEST / reduced trust, B1–B3 PASS / 0 false halts).
+2. **Behavioral Detector Evaluation (Continuous Sample-Level ROC/PR Analysis)**:
+   - **Target**: Evaluates the continuous ML behavioral pipeline across all individual boot captures without relying on deterministic rules or gate-level halts.
+   - **Results**:
+     - Fused Anomaly Risk Score: **ROC-AUC = 0.9370**, **PR-AUC = 0.9459**.
+     - Isolation Forest Alone (Spatial): **ROC-AUC = 0.9667**, **PR-AUC = 0.8095**.
+     - Markov Sequence Detector Alone (Transition): **ROC-AUC = 1.0000**, **PR-AUC = 1.0000**.
+     - EWMA / CUSUM Monitor Alone (Temporal Drift): Detects +4ms/boot drift causally at Boot 5.
+

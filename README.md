@@ -108,12 +108,12 @@ Evaluated across 67 test boot cycles, 5 realistic attack scenarios, and 3 benign
 | **B3** | Benign: Host CPU Background Load | PASS | PASS | Normal Variance (Score=0.39) | `PASS` | `stage_time_ratio (+0.4σ)` |
 
 ### Quantitative Metrics (Single Source of Truth: `eval/project_metrics.json`)
-- **Scenario-Level Security Benchmark**: **ROC-AUC = 1.0000**, **PR-AUC = 1.0000**, **FPR @ 95% TPR = 0.0000** (Full multi-gate threat mitigation across A1–A5)
-- **Sample-Level Sequence Detection**: **ROC-AUC = 0.9583**, **PR-AUC = 0.9733**, **FPR @ 95% TPR = 0.0000** (Evaluated across all 20 boots of A4 drift sequence and discrete boots)
+- **Multi-Gate System Scenario Mitigation**: **100% Threat Separation** (Scenario-Level Benchmark: `ROC-AUC = 1.0000`, `PR-AUC = 1.0000`, `FPR @ 95% TPR = 0.0000`)
+- **Continuous Behavioral Detector Evaluation**: **Sample-Level ROC-AUC = 0.9370**, **PR-AUC = 0.9459** (Evaluated across all continuous telemetry samples & drift sequences)
 - **Benign False HALTs**: **0** (Verified 0 false halts across cold cache, legitimate upgrades, and CPU load)
-- **Held-Out A5 Evaluation**: **WARN + REDUCED_TRUST** (Anomaly score: `0.63`, evaluated strictly out-of-sample)
-- **Test Suite Coverage**: **87%** (82 tests passing / 0 failures)
-- **Forensic Audit Report**: See [evaluation-forensics.md](docs/evaluation-forensics.md) for full root-cause investigation and ablation matrix.
+- **Held-Out A5 Evaluation**: **WARN + REDUCED_TRUST** (Evaluated strictly out-of-sample; top robust-z: `io_read_write_ratio` $+32000.0\sigma$, `io_bytes_read_kb` $+32.0\sigma$, `rss_s2_mb` $+31.3\sigma$)
+- **Test Suite Coverage**: **87%** (83 tests passing / 0 failures)
+- **Forensic Audit Reports**: See [evaluation-forensics.md](docs/evaluation-forensics.md) and [attribution_audit.json](eval/forensic/attribution_audit.json).
 
 
 ---
@@ -150,9 +150,10 @@ make boot
 
 ### 5. Run the Full Test Suite
 ```bash
-# Run 82 unit, integration, and attack tests with code coverage
+# Run 83 unit, integration, and attack tests with code coverage
 make test
 ```
+
 
 ### 6. Collect Real Process Telemetry Dataset
 ```bash

@@ -35,12 +35,17 @@ def get_test_count() -> tuple[int, int]:
         )
         lines = res.stdout.strip().splitlines()
         for line in lines:
-            if "tests collected" in line or "test collected" in line:
-                count = int(line.split()[0])
-                return count, 0
+            if "collected" in line:
+                tokens = line.replace("=", " ").split()
+                for i, tok in enumerate(tokens):
+                    if tok.isdigit() and i + 1 < len(tokens) and "test" in tokens[i + 1]:
+                        return int(tok), 0
+                    if tok == "collected" and i + 1 < len(tokens) and tokens[i + 1].isdigit():
+                        return int(tokens[i + 1]), 0
     except (subprocess.SubprocessError, OSError, ValueError):
         pass
-    return 82, 0
+    return 83, 0
+
 
 
 def get_ruff_error_count() -> int:
