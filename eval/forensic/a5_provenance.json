@@ -7,7 +7,7 @@
     "training_data_source": "data/telemetry/normal_boots.jsonl (Golden native hardware boots only)",
     "attack_generator": "src/bootsentry/attacks/a5_cross_sku.py",
     "feature_isolation": "Evaluated strictly out-of-sample against frozen baseline Isolation Forest model",
-    "observed_anomaly": "Foreign NUMA allocation routines and memory footprint trigger +128897124.0sigma robust-z spike on io_read_write_ratio and +195359.7sigma on memory allocation",
+    "observed_anomaly": "Foreign NUMA allocation routines and memory footprint trigger +32000.0sigma robust-z on io_read_write_ratio (principled natural-unit dispersion scale, not artificial 1e-4 floor), +32.0sigma on io_bytes_read_kb, and +31.3sigma on rss_s2_mb",
     "policy_verdict": "WARN + REDUCED_TRUST"
   }
 }

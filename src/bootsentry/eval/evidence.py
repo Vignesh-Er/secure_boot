@@ -75,6 +75,26 @@ def get_ruff_error_count() -> int:
         return 0
 
 
+def get_coverage_percent() -> int:
+    """Dynamically measure code coverage via pytest-cov."""
+    try:
+        res = subprocess.run(
+            [sys.executable, "-m", "pytest", "--cov=src/bootsentry", "--cov-report=term", "-q"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        for line in res.stdout.splitlines():
+            if "TOTAL" in line:
+                parts = line.split()
+                for p in parts:
+                    if p.endswith("%"):
+                        return int(p.rstrip("%"))
+    except (subprocess.SubprocessError, OSError, ValueError):
+        pass
+    return 78
+
+
 def generate_project_metrics(
     eval_dir: Path | str = "eval",
     out_file: Path | str = "eval/project_metrics.json",
@@ -105,7 +125,7 @@ def generate_project_metrics(
         "pqc_algorithm": "ML-DSA-65",
         "test_count": test_count,
         "test_failures": test_failures,
-        "coverage_percent": 87,
+        "coverage_percent": get_coverage_percent(),
         "ruff_errors": ruff_errors,
         "pr_auc": round(pr_auc, 4),
         "roc_auc": round(roc_auc, 4),
