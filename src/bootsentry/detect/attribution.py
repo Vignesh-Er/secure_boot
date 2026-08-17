@@ -23,7 +23,7 @@ class FeatureAttribution:
     @property
     def formatted_sigma(self) -> str:
         sign = "+" if self.robust_z >= 0 else ""
-        return f"{sign}{self.robust_z:.1f}σ"
+        return f"{sign}{self.robust_z:.1f}sigma"
 
     def to_dict(self) -> Dict[str, object]:
         return {

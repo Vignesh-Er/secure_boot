@@ -16,7 +16,7 @@ SAFE_DEMO_SCENARIOS: Dict[str, Dict[str, Any]] = {
         ],
         "gate1_crypto": {"status": "PASS", "algorithm": "ML-DSA-65", "detail": "All stage signatures authentic"},
         "gate2_measure": {"status": "PASS", "detail": "PCR[0..3] extended and event log replay consistent"},
-        "gate3_behavior": {"status": "PASS", "score": 0.08, "detail": "Telemetry within 1.1σ normal baseline"},
+        "gate3_behavior": {"status": "PASS", "score": 0.08, "detail": "Telemetry within 1.1sigma normal baseline"},
         "pcrs": {
             "PCR0": "7e3b8a1c9f4d2e0b5a6c7d8e9f0a1b2c3d4e5f6a",
             "PCR1": "c9e4b2d1a0f8e7c6b5a4d3c2b1a0f9e8d7c6b5a4",
@@ -27,9 +27,9 @@ SAFE_DEMO_SCENARIOS: Dict[str, Dict[str, Any]] = {
         "reason": "All cryptographic signatures valid; behavior consistent with trusted baseline",
         "attestation": "TRUSTED (ML-DSA-65 Signed Quote)",
         "attributions": [
-            {"feature": "t_exec_s2", "observed": "10.2 ms", "baseline": "10.0 ms", "sigma": "+0.2σ"},
-            {"feature": "rss_peak_mb", "observed": "16.1 MB", "baseline": "15.8 MB", "sigma": "+0.3σ"},
-            {"feature": "ctx_switch_ratio", "observed": "0.14", "baseline": "0.15", "sigma": "-0.1σ"},
+            {"feature": "t_exec_s2", "observed": "10.2 ms", "baseline": "10.0 ms", "sigma": "+0.2sigma"},
+            {"feature": "rss_peak_mb", "observed": "16.1 MB", "baseline": "15.8 MB", "sigma": "+0.3sigma"},
+            {"feature": "ctx_switch_ratio", "observed": "0.14", "baseline": "0.15", "sigma": "-0.1sigma"},
         ],
     },
     "byte_tamper": {
@@ -79,9 +79,9 @@ SAFE_DEMO_SCENARIOS: Dict[str, Dict[str, Any]] = {
         "reason": "Deterministic Security Rule Floor: Security Version Counter Rollback detected (SVN=3 < 5)",
         "attestation": "UNTRUSTED (Security Version Rollback)",
         "attributions": [
-            {"feature": "security_version_counter", "observed": "3", "baseline": "5", "sigma": "-4.2σ"},
-            {"feature": "t_exec_s2", "observed": "16.5 ms", "baseline": "10.0 ms", "sigma": "+2.1σ"},
-            {"feature": "payload_size", "observed": "1024 B", "baseline": "1536 B", "sigma": "-1.8σ"},
+            {"feature": "security_version_counter", "observed": "3", "baseline": "5", "sigma": "-4.2sigma"},
+            {"feature": "t_exec_s2", "observed": "16.5 ms", "baseline": "10.0 ms", "sigma": "+2.1sigma"},
+            {"feature": "payload_size", "observed": "1024 B", "baseline": "1536 B", "sigma": "-1.8sigma"},
         ],
     },
     "a2_toctou": {
@@ -106,9 +106,9 @@ SAFE_DEMO_SCENARIOS: Dict[str, Dict[str, Any]] = {
         "reason": "Authentic signatures verified; AI behavioral anomaly detected (Excessive S2 CPU/Memory/IO)",
         "attestation": "REDUCED_TRUST (Behavioral Anomaly Warning)",
         "attributions": [
-            {"feature": "t_exec_s2", "observed": "48.2 ms", "baseline": "10.0 ms", "sigma": "+5.8σ"},
-            {"feature": "rss_s2_mb", "observed": "48.5 MB", "baseline": "14.0 MB", "sigma": "+4.9σ"},
-            {"feature": "io_bytes_read_kb", "observed": "80.0 KB", "baseline": "8.0 KB", "sigma": "+4.2σ"},
+            {"feature": "t_exec_s2", "observed": "48.2 ms", "baseline": "10.0 ms", "sigma": "+5.8sigma"},
+            {"feature": "rss_s2_mb", "observed": "48.5 MB", "baseline": "14.0 MB", "sigma": "+4.9sigma"},
+            {"feature": "io_bytes_read_kb", "observed": "80.0 KB", "baseline": "8.0 KB", "sigma": "+4.2sigma"},
         ],
     },
     "a3_reorder": {
@@ -133,9 +133,9 @@ SAFE_DEMO_SCENARIOS: Dict[str, Dict[str, Any]] = {
         "reason": "Authentic signatures verified; Markov Sequence anomaly detected (Unseen service ordering)",
         "attestation": "REDUCED_TRUST (Sequence Anomaly Warning)",
         "attributions": [
-            {"feature": "markov_transition_nll", "observed": "8.4 NLL", "baseline": "1.2 NLL", "sigma": "+6.2σ"},
-            {"feature": "unseen_transitions", "observed": "2", "baseline": "0", "sigma": "+5.0σ"},
-            {"feature": "t_exec_s3", "observed": "16.5 ms", "baseline": "11.8 ms", "sigma": "+2.4σ"},
+            {"feature": "markov_transition_nll", "observed": "8.4 NLL", "baseline": "1.2 NLL", "sigma": "+6.2sigma"},
+            {"feature": "unseen_transitions", "observed": "2", "baseline": "0", "sigma": "+5.0sigma"},
+            {"feature": "t_exec_s3", "observed": "16.5 ms", "baseline": "11.8 ms", "sigma": "+2.4sigma"},
         ],
     },
     "a4_drift": {
@@ -160,9 +160,9 @@ SAFE_DEMO_SCENARIOS: Dict[str, Dict[str, Any]] = {
         "reason": "Authentic signatures verified; Multi-Boot EWMA / CUSUM drift monitor detected persistent accumulation",
         "attestation": "REDUCED_TRUST (Multi-Boot Drift Alarm)",
         "attributions": [
-            {"feature": "cusum_drift_score", "observed": "5.4 CUSUM", "baseline": "0.0", "sigma": "+5.4σ"},
-            {"feature": "ewma_boot_time", "observed": "101.9 ms", "baseline": "40.5 ms", "sigma": "+4.8σ"},
-            {"feature": "ctx_switches_invol", "observed": "18", "baseline": "2", "sigma": "+3.9σ"},
+            {"feature": "cusum_drift_score", "observed": "5.4 CUSUM", "baseline": "0.0", "sigma": "+5.4sigma"},
+            {"feature": "ewma_boot_time", "observed": "101.9 ms", "baseline": "40.5 ms", "sigma": "+4.8sigma"},
+            {"feature": "ctx_switches_invol", "observed": "18", "baseline": "2", "sigma": "+3.9sigma"},
         ],
     },
     "benign_load": {
@@ -187,9 +187,9 @@ SAFE_DEMO_SCENARIOS: Dict[str, Dict[str, Any]] = {
         "reason": "All signatures valid; behavioral variance accounted for by invariant stage ratios (NO FALSE HALT)",
         "attestation": "TRUSTED (Valid Boot Under Load)",
         "attributions": [
-            {"feature": "t_total_boot", "observed": "84.5 ms", "baseline": "40.5 ms", "sigma": "+2.8σ"},
-            {"feature": "stage_time_ratio_s2", "observed": "0.45", "baseline": "0.42", "sigma": "+0.4σ"},
-            {"feature": "verify_time_fraction", "observed": "0.26", "baseline": "0.28", "sigma": "-0.2σ"},
+            {"feature": "t_total_boot", "observed": "84.5 ms", "baseline": "40.5 ms", "sigma": "+2.8sigma"},
+            {"feature": "stage_time_ratio_s2", "observed": "0.45", "baseline": "0.42", "sigma": "+0.4sigma"},
+            {"feature": "verify_time_fraction", "observed": "0.26", "baseline": "0.28", "sigma": "-0.2sigma"},
         ],
     },
     "a5_cross_sku": {
@@ -214,9 +214,9 @@ SAFE_DEMO_SCENARIOS: Dict[str, Dict[str, Any]] = {
         "reason": "Authentic signatures verified; Out-of-Sample Behavioral Anomaly Detected on Foreign SKU Profile",
         "attestation": "REDUCED_TRUST (Cross-SKU Anomaly Warning)",
         "attributions": [
-            {"feature": "rss_s2_mb", "observed": "64.0 MB", "baseline": "14.0 MB", "sigma": "+5.2σ"},
-            {"feature": "t_exec_s2", "observed": "38.0 ms", "baseline": "10.0 ms", "sigma": "+4.1σ"},
-            {"feature": "ctx_switches_vol", "observed": "28", "baseline": "8", "sigma": "+2.9σ"},
+            {"feature": "rss_s2_mb", "observed": "64.0 MB", "baseline": "14.0 MB", "sigma": "+5.2sigma"},
+            {"feature": "t_exec_s2", "observed": "38.0 ms", "baseline": "10.0 ms", "sigma": "+4.1sigma"},
+            {"feature": "ctx_switches_vol", "observed": "28", "baseline": "8", "sigma": "+2.9sigma"},
         ],
     },
 }

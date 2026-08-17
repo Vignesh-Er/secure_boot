@@ -44,7 +44,7 @@ def render_bootsentry_dashboard(scenario_data: Dict[str, Any]) -> None:
 
     # 1. Header Banner
     header_text = Text.from_markup(
-        f"[bold cyan]BOOTSENTRY[/bold cyan] [white]— Post-Quantum AI Secure Boot & Integrity Verification[/white]\n"
+        f"[bold cyan]BOOTSENTRY[/bold cyan] [white]-- Post-Quantum AI Secure Boot & Integrity Verification[/white]\n"
         f"[dim]Scenario: [bold yellow]{title}[/bold yellow] | {description}[/dim]"
     )
     header_panel = Panel(header_text, style="blue", box=ROUNDED)
@@ -134,7 +134,7 @@ def render_bootsentry_dashboard(scenario_data: Dict[str, Any]) -> None:
             obs = a.get("observed", "")
             base = a.get("baseline", "")
             sig = a.get("sigma", "")
-            attr_lines.append(f"  • [bold white]{f_name:<24}[/bold white] observed=[cyan]{obs:<10}[/cyan] normal_ref=[dim]{base:<10}[/dim] deviation=[bold magenta]{sig:>8}[/bold magenta]")
+            attr_lines.append(f"  * [bold white]{f_name:<24}[/bold white] observed=[cyan]{obs:<10}[/cyan] normal_ref=[dim]{base:<10}[/dim] deviation=[bold magenta]{sig:>8}[/bold magenta]")
 
     attestation_line = f"[bold white]Attestation State:[/bold white] [bold cyan]{attestation}[/bold cyan]"
     reason_line = f"[bold white]Decision Rationale:[/bold white] {reason}"
