@@ -15,21 +15,23 @@ BootSentry Defense:
 from __future__ import annotations
 
 import hashlib
-import json
 import math
 import tempfile
 import time
 from pathlib import Path
-from typing import Tuple
 
-from bootsentry.boot.runner import BootExecutionResult, execute_boot_chain, initialize_default_environment
+from bootsentry.boot.runner import (
+    BootExecutionResult,
+    execute_boot_chain,
+    initialize_default_environment,
+)
 from bootsentry.telemetry.record import BootRecord, StageTelemetry
 
 
 def execute_attack_a2(
     base_dir: Path | str = ".",
     workload_multiplier: int = 20,
-) -> Tuple[BootExecutionResult, BootRecord]:
+) -> tuple[BootExecutionResult, BootRecord]:
     """Execute Attack A2 (TOCTOU Config Swap)."""
     base = Path(base_dir)
     keys_dir = base / "config" / "keys"

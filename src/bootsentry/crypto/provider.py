@@ -7,9 +7,7 @@ for ML-DSA-44, ML-DSA-87, and SLH-DSA algorithms.
 from __future__ import annotations
 
 import abc
-import hashlib
-import time
-from typing import ClassVar, Dict, List, Tuple, Type
+from typing import ClassVar
 
 
 class CryptoError(Exception):
@@ -37,7 +35,7 @@ class PQCProvider(abc.ABC):
     signature_size: ClassVar[int]
 
     @abc.abstractmethod
-    def keygen(self) -> Tuple[bytes, bytes]:
+    def keygen(self) -> tuple[bytes, bytes]:
         """Generate (public_key_bytes, secret_key_bytes)."""
 
     @abc.abstractmethod
@@ -69,7 +67,7 @@ class MLDSA65DilithiumProvider(PQCProvider):
     secret_key_size = 4000
     signature_size = 3293
 
-    def keygen(self) -> Tuple[bytes, bytes]:
+    def keygen(self) -> tuple[bytes, bytes]:
         if not DILITHIUM_PY_AVAILABLE:
             raise CryptoError("dilithium-py backend is not installed.")
         return Dilithium3.keygen()
@@ -92,7 +90,7 @@ class MLDSA65DilithiumProvider(PQCProvider):
             return False
         try:
             return bool(Dilithium3.verify(public_key, message, signature))
-        except Exception:
+        except (ValueError, TypeError, IndexError, KeyError, RuntimeError, CryptoError):
             return False
 
 
@@ -104,7 +102,7 @@ class MLDSA44DilithiumProvider(PQCProvider):
     secret_key_size = 2528
     signature_size = 2420
 
-    def keygen(self) -> Tuple[bytes, bytes]:
+    def keygen(self) -> tuple[bytes, bytes]:
         if not DILITHIUM_PY_AVAILABLE:
             raise CryptoError("dilithium-py backend is not installed.")
         return Dilithium2.keygen()
@@ -121,13 +119,11 @@ class MLDSA44DilithiumProvider(PQCProvider):
     def verify(self, public_key: bytes, message: bytes, signature: bytes) -> bool:
         if not DILITHIUM_PY_AVAILABLE:
             raise CryptoError("dilithium-py backend is not installed.")
-        if len(public_key) != self.public_key_size:
-            return False
-        if len(signature) != self.signature_size:
+        if len(public_key) != self.public_key_size or len(signature) != self.signature_size:
             return False
         try:
             return bool(Dilithium2.verify(public_key, message, signature))
-        except Exception:
+        except (ValueError, TypeError, IndexError, KeyError, RuntimeError, CryptoError):
             return False
 
 
@@ -139,7 +135,7 @@ class MLDSA87DilithiumProvider(PQCProvider):
     secret_key_size = 4864
     signature_size = 4595
 
-    def keygen(self) -> Tuple[bytes, bytes]:
+    def keygen(self) -> tuple[bytes, bytes]:
         if not DILITHIUM_PY_AVAILABLE:
             raise CryptoError("dilithium-py backend is not installed.")
         return Dilithium5.keygen()
@@ -156,13 +152,11 @@ class MLDSA87DilithiumProvider(PQCProvider):
     def verify(self, public_key: bytes, message: bytes, signature: bytes) -> bool:
         if not DILITHIUM_PY_AVAILABLE:
             raise CryptoError("dilithium-py backend is not installed.")
-        if len(public_key) != self.public_key_size:
-            return False
-        if len(signature) != self.signature_size:
+        if len(public_key) != self.public_key_size or len(signature) != self.signature_size:
             return False
         try:
             return bool(Dilithium5.verify(public_key, message, signature))
-        except Exception:
+        except (ValueError, TypeError, IndexError, KeyError, RuntimeError, CryptoError):
             return False
 
 
@@ -177,9 +171,8 @@ try:
     _test_sig = oqs.Signature("ML-DSA-65")
     _test_sig.free()
     LIBOQS_AVAILABLE = True
-except (ImportError, Exception, SystemExit, BaseException):
+except (ImportError, AttributeError, RuntimeError, ValueError, CryptoError, SystemExit):
     LIBOQS_AVAILABLE = False
-
 
 
 class LibOQSProvider(PQCProvider):
@@ -202,7 +195,7 @@ class LibOQSProvider(PQCProvider):
         }
         return mapping.get(alg, alg)
 
-    def keygen(self) -> Tuple[bytes, bytes]:
+    def keygen(self) -> tuple[bytes, bytes]:
         with oqs.Signature(self._oqs_name) as signer:
             public_key = signer.generate_keypair()
             secret_key = signer.export_secret_key()
@@ -216,7 +209,7 @@ class LibOQSProvider(PQCProvider):
         try:
             with oqs.Signature(self._oqs_name) as verifier:
                 return verifier.verify(message, signature, public_key)
-        except Exception:
+        except (ImportError, RuntimeError, ValueError, TypeError, CryptoError):
             return False
 
 
@@ -224,7 +217,7 @@ class LibOQSProvider(PQCProvider):
 # Provider Registry & Factory
 # -------------------------------------------------------------------------
 
-_REGISTRY: Dict[str, Type[PQCProvider]] = {
+_REGISTRY: dict[str, type[PQCProvider]] = {
     "ML-DSA-65": MLDSA65DilithiumProvider,
     "ML-DSA-44": MLDSA44DilithiumProvider,
     "ML-DSA-87": MLDSA87DilithiumProvider,
@@ -242,7 +235,7 @@ def get_provider(algorithm: str = "ML-DSA-65") -> PQCProvider:
     if LIBOQS_AVAILABLE:
         try:
             return LibOQSProvider(algorithm)
-        except Exception:
+        except (ImportError, RuntimeError, ValueError, TypeError, CryptoError):
             pass
 
     provider_cls = _REGISTRY.get(algorithm)
@@ -253,12 +246,12 @@ def get_provider(algorithm: str = "ML-DSA-65") -> PQCProvider:
     return provider_cls()
 
 
-def list_supported_algorithms() -> List[str]:
+def list_supported_algorithms() -> list[str]:
     """List all supported PQC signature algorithms at runtime."""
+    import contextlib
     algs = list(_REGISTRY.keys())
     if LIBOQS_AVAILABLE:
-        try:
+        with contextlib.suppress(ImportError, AttributeError, RuntimeError):
             algs.extend(oqs.get_enabled_sig_mechanisms())
-        except Exception:
-            pass
-    return sorted(list(set(algs)))
+    return sorted(set(algs))
+

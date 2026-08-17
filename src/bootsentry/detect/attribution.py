@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Tuple
+
 import joblib
 import numpy as np
 
-from bootsentry.features.extractor import FEATURE_NAMES, extract_feature_dict, extract_feature_matrix
+from bootsentry.features.extractor import (
+    FEATURE_NAMES,
+    extract_feature_dict,
+    extract_feature_matrix,
+)
 from bootsentry.telemetry.record import BootRecord
 
 
@@ -25,7 +29,7 @@ class FeatureAttribution:
         sign = "+" if self.robust_z >= 0 else ""
         return f"{sign}{self.robust_z:.1f}sigma"
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         return {
             "feature_name": self.feature_name,
             "observed_value": self.observed_value,
@@ -40,10 +44,10 @@ class AttributionEngine:
     """Calculates robust z-score feature deviations to explain why a boot is anomalous."""
 
     def __init__(self):
-        self.medians: Dict[str, float] = {}
-        self.mads: Dict[str, float] = {}
+        self.medians: dict[str, float] = {}
+        self.mads: dict[str, float] = {}
 
-    def fit(self, records: List[BootRecord]) -> AttributionEngine:
+    def fit(self, records: list[BootRecord]) -> AttributionEngine:
         """Calculate median and MAD for all 28 continuous features from normal baseline boots."""
         X = extract_feature_matrix(records)
         for i, name in enumerate(FEATURE_NAMES):
@@ -54,10 +58,10 @@ class AttributionEngine:
             self.mads[name] = max(1e-4, mad)
         return self
 
-    def explain(self, record: BootRecord, top_k: int = 3) -> List[FeatureAttribution]:
+    def explain(self, record: BootRecord, top_k: int = 3) -> list[FeatureAttribution]:
         """Compute robust z-scores and return Top K most deviating features."""
         feat_dict = extract_feature_dict(record)
-        attributions: List[FeatureAttribution] = []
+        attributions: list[FeatureAttribution] = []
 
         for name in FEATURE_NAMES:
             obs = feat_dict[name]

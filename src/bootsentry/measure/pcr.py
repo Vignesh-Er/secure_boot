@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
 
 
 @dataclass
@@ -12,7 +11,7 @@ class PcrBank:
     """Simulates a TPM 2.0 PCR Bank with SHA-256 hash extension."""
 
     num_registers: int = 8
-    registers: Dict[int, str] = field(default_factory=dict)
+    registers: dict[int, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if not self.registers:
@@ -48,11 +47,11 @@ class PcrBank:
             raise IndexError(f"PCR index {pcr_index} is out of bounds")
         return self.registers[pcr_index]
 
-    def snapshot(self) -> Dict[int, str]:
+    def snapshot(self) -> dict[int, str]:
         """Return a copy of the current PCR state."""
         return dict(self.registers)
 
-    def composite_digest(self, selected_pcrs: Optional[List[int]] = None) -> str:
+    def composite_digest(self, selected_pcrs: list[int] | None = None) -> str:
         """Calculate composite hash of selected PCRs (defaults to all)."""
         indices = selected_pcrs if selected_pcrs is not None else sorted(self.registers.keys())
         hasher = hashlib.sha256()
@@ -61,14 +60,14 @@ class PcrBank:
             hasher.update(bytes.fromhex(self.registers[idx]))
         return hasher.hexdigest()
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         """Serialize PCR bank to string-keyed dictionary."""
         return {f"PCR{k}": v for k, v in self.registers.items()}
 
     @classmethod
-    def from_dict(cls, data: Dict[str, str]) -> PcrBank:
+    def from_dict(cls, data: dict[str, str]) -> PcrBank:
         """Construct PcrBank from serialized dictionary."""
-        regs: Dict[int, str] = {}
+        regs: dict[int, str] = {}
         for k, v in data.items():
             idx = int(k.replace("PCR", ""))
             regs[idx] = v

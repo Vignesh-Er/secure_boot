@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Tuple
 import numpy as np
 
-from bootsentry.telemetry.record import FEATURE_VERSION, BootRecord, StageTelemetry
+from bootsentry.telemetry.record import BootRecord, StageTelemetry
 
-FEATURE_NAMES: List[str] = [
+FEATURE_NAMES: list[str] = [
     "t_verify_s0",
     "t_verify_s1",
     "t_verify_s2",
@@ -41,7 +40,7 @@ FEATURE_NAMES: List[str] = [
 NUM_FEATURES = len(FEATURE_NAMES)  # Exactly 28 features
 
 
-def extract_feature_dict(record: BootRecord) -> Dict[str, float]:
+def extract_feature_dict(record: BootRecord) -> dict[str, float]:
     """Extract a dictionary of 28 continuous features from a BootRecord."""
     s0 = record.stages.get("S0", StageTelemetry(stage_id="S0"))
     s1 = record.stages.get("S1", StageTelemetry(stage_id="S1"))
@@ -141,7 +140,7 @@ def extract_feature_vector(record: BootRecord) -> np.ndarray:
     return np.array([feat_dict[k] for k in FEATURE_NAMES], dtype=np.float64)
 
 
-def extract_feature_matrix(records: List[BootRecord]) -> np.ndarray:
+def extract_feature_matrix(records: list[BootRecord]) -> np.ndarray:
     """Extract a 2D numpy matrix (N, 28) for training/evaluation."""
     rows = [extract_feature_vector(rec) for rec in records]
     return np.array(rows, dtype=np.float64)

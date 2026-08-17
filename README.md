@@ -21,10 +21,11 @@ Standard cryptographic secure boot systems (such as UEFI Secure Boot) verify sta
 5. **Cross-SKU Image Substitutions**: Validly signed images from adjacent product lines running on improper hardware profiles.
 
 **BootSentry** is a unified, defense-in-depth secure boot architecture combining:
-- **Gate 1: Post-Quantum Cryptography (PQC)** — Deterministic NIST FIPS 204 **ML-DSA-65** (Dilithium3) digital signatures and RFC 8785 canonical JSON manifests.
-- **Gate 2: Measured Boot & Attestation** — Software TPM SHA-256 Platform Configuration Registers (PCRs 0–3), append-only cryptographic event log, and signed attestation quotes.
+- **Gate 1: Post-Quantum Cryptography (PQC)** — Deterministic NIST FIPS 204 **ML-DSA-65** digital signatures and RFC 8785 canonical JSON manifests.
+- **Gate 2: Measured Boot & Attestation** — TPM-style software simulation SHA-256 Platform Configuration Registers (PCRs 0–3), append-only cryptographic event log, and signed attestation quotes.
 - **Gate 3: Behavioral AI Anomaly Detection** — 28-feature continuous execution telemetry pipeline, 3-layer anomaly detection ensemble (Isolation Forest, 1st-order Markov Sequence Model, Multi-boot EWMA/CUSUM Drift Monitor), and Robust Median/MAD z-score attribution engine.
 - **Deterministic Rule Floor & 3-Level Policy Engine** — Non-bypassable deterministic safety floor enforcing **Invariant 3**: *AI anomaly scores alone never authorize a HALT (no false bricking); HALT strictly requires deterministic rule corroboration.*
+
 
 ---
 

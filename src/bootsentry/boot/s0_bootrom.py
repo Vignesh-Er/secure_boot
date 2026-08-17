@@ -4,14 +4,11 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import json
-import os
 import subprocess
 import sys
 import time
 import uuid
 from pathlib import Path
-from typing import Dict, Optional
 
 from bootsentry.boot.handoff import BootHandoff
 from bootsentry.crypto.keys import load_public_key
@@ -25,7 +22,7 @@ def run_stage_0(
     keys_dir: Path | str,
     stages_dir: Path | str,
     run_dir: Path | str,
-    boot_id: Optional[str] = None,
+    boot_id: str | None = None,
     spawn_next: bool = True,
 ) -> BootHandoff:
     """Execute Stage 0 (BootROM).

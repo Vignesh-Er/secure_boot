@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator, List, Optional
 
 from bootsentry.telemetry.record import BootRecord
 
@@ -19,14 +19,14 @@ def log_boot_record(record: BootRecord, file_path: Path | str) -> None:
         f.flush()
 
 
-def read_boot_records(file_path: Path | str) -> List[BootRecord]:
+def read_boot_records(file_path: Path | str) -> list[BootRecord]:
     """Read all BootRecords from a JSONL file."""
     path = Path(file_path)
     if not path.exists():
         return []
 
     records = []
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         for line in f:
             stripped = line.strip()
             if stripped:
@@ -44,7 +44,7 @@ def iter_boot_records(file_path: Path | str) -> Iterator[BootRecord]:
     if not path.exists():
         return
 
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         for line in f:
             stripped = line.strip()
             if stripped:

@@ -1,6 +1,7 @@
 """Unit and integration tests for Attack Scenarios A1-A5 and Benign Controls."""
 
 import pytest
+
 from bootsentry.attacks.a1_downgrade import execute_attack_a1
 from bootsentry.attacks.a2_toctou import execute_attack_a2
 from bootsentry.attacks.a3_reorder import execute_attack_a3

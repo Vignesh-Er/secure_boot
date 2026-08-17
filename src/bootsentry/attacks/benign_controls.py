@@ -12,18 +12,20 @@ Scenarios:
 from __future__ import annotations
 
 import tempfile
-import time
 from pathlib import Path
-from typing import Tuple
 
-from bootsentry.boot.runner import BootExecutionResult, execute_boot_chain, initialize_default_environment
+from bootsentry.boot.runner import (
+    BootExecutionResult,
+    execute_boot_chain,
+    initialize_default_environment,
+)
 from bootsentry.crypto.keys import load_secret_key
 from bootsentry.crypto.manifest import Manifest, compute_payload_sha256
 from bootsentry.crypto.sign import sign_manifest
 from bootsentry.telemetry.record import BootRecord, StageTelemetry
 
 
-def execute_benign_cold_cache(base_dir: Path | str = ".") -> Tuple[BootExecutionResult, BootRecord]:
+def execute_benign_cold_cache(base_dir: Path | str = ".") -> tuple[BootExecutionResult, BootRecord]:
     """Execute clean boot under simulated cold-cache conditions."""
     base = Path(base_dir)
     keys_dir = base / "config" / "keys"
@@ -58,7 +60,7 @@ def execute_benign_cold_cache(base_dir: Path | str = ".") -> Tuple[BootExecution
 def execute_benign_firmware_upgrade(
     base_dir: Path | str = ".",
     new_svn: int = 6,
-) -> Tuple[BootExecutionResult, BootRecord]:
+) -> tuple[BootExecutionResult, BootRecord]:
     """Execute legitimate, authorized firmware upgrade (SVN=6)."""
     base = Path(base_dir)
     keys_dir = base / "config" / "keys"
@@ -120,7 +122,7 @@ def execute_benign_firmware_upgrade(
         return boot_res, record
 
 
-def execute_benign_cpu_load(base_dir: Path | str = ".") -> Tuple[BootExecutionResult, BootRecord]:
+def execute_benign_cpu_load(base_dir: Path | str = ".") -> tuple[BootExecutionResult, BootRecord]:
     """Execute clean boot while host CPU is under background computation load."""
     base = Path(base_dir)
     keys_dir = base / "config" / "keys"

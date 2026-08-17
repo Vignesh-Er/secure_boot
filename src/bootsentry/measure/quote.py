@@ -8,9 +8,9 @@ import secrets
 import time
 import uuid
 from dataclasses import asdict, dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
-from bootsentry.crypto.provider import get_provider
+from bootsentry.crypto.provider import CryptoError, get_provider
 from bootsentry.measure.eventlog import EventLog
 from bootsentry.measure.pcr import PcrBank
 
@@ -18,15 +18,15 @@ from bootsentry.measure.pcr import PcrBank
 @dataclass
 class AttestationQuote:
     boot_id: str
-    pcr_snapshot: Dict[str, str]
+    pcr_snapshot: dict[str, str]
     pcr_composite_digest: str
     event_log_digest: str
     nonce: str
     timestamp_ns: int
     algorithm: str = "ML-DSA-65"
-    signature: Optional[str] = None
+    signature: str | None = None
 
-    def canonical_dict(self) -> Dict[str, Any]:
+    def canonical_dict(self) -> dict[str, Any]:
         d = asdict(self)
         d.pop("signature", None)
         return d
@@ -39,11 +39,11 @@ class AttestationQuote:
     def canonical_digest(self) -> str:
         return hashlib.sha256(self.canonical_bytes()).hexdigest()
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> AttestationQuote:
+    def from_dict(cls, data: dict[str, Any]) -> AttestationQuote:
         return cls(
             boot_id=str(data["boot_id"]),
             pcr_snapshot=dict(data["pcr_snapshot"]),
@@ -60,8 +60,8 @@ def generate_attestation_quote(
     pcr_bank: PcrBank,
     event_log: EventLog,
     attestation_secret_key_bytes: bytes,
-    nonce: Optional[str] = None,
-    boot_id: Optional[str] = None,
+    nonce: str | None = None,
+    boot_id: str | None = None,
     algorithm: str = "ML-DSA-65",
 ) -> AttestationQuote:
     """Generate and cryptographically sign a TPM-style attestation quote."""
@@ -88,8 +88,8 @@ def generate_attestation_quote(
 def verify_attestation_quote(
     quote: AttestationQuote,
     attestation_public_key_bytes: bytes,
-    expected_nonce: Optional[str] = None,
-) -> Tuple[bool, str]:
+    expected_nonce: str | None = None,
+) -> tuple[bool, str]:
     """Verify an attestation quote's cryptographic signature and freshness nonce."""
     if not quote.signature:
         return False, "Attestation quote is unsigned"
@@ -110,5 +110,6 @@ def verify_attestation_quote(
         if not is_valid:
             return False, "PQC signature verification failed for attestation quote"
         return True, "Attestation quote cryptographically verified"
-    except Exception as exc:
+    except (CryptoError, ValueError, TypeError, KeyError, OSError, RuntimeError, AttributeError, IndexError) as exc:
         return False, f"Attestation verification error: {exc}"
+

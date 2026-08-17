@@ -1,6 +1,6 @@
 {
-  "roc_auc": 0.7635658914728682,
-  "pr_auc": 0.7582241207925392,
+  "roc_auc": 0.7267441860465116,
+  "pr_auc": 0.731040396409253,
   "fpr_at_95_tpr": 1.0,
   "benign_incorrect_halts": 0,
   "total_test_samples": 67,
@@ -15,8 +15,8 @@
     {
       "name": "A2: TOCTOU Config Swap",
       "verdict": "WARN",
-      "if_score": 0.249053564542,
-      "top_attr": "+322242.8\u03c3"
+      "if_score": 0.10435201859731655,
+      "top_attr": "+322242.8sigma"
     },
     {
       "name": "A3: Service Reorder",
@@ -31,8 +31,8 @@
     {
       "name": "A5: Cross-SKU (Held-Out)",
       "verdict": "WARN",
-      "if_score": 0.5730783123761685,
-      "top_attr": "+128897124.0\u03c3"
+      "if_score": 0.5784027203335774,
+      "top_attr": "+128897124.0sigma"
     },
     {
       "name": "Benign: Cold Cache",

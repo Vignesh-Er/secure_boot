@@ -17,9 +17,12 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import Tuple
 
-from bootsentry.boot.runner import BootExecutionResult, execute_boot_chain, initialize_default_environment
+from bootsentry.boot.runner import (
+    BootExecutionResult,
+    execute_boot_chain,
+    initialize_default_environment,
+)
 from bootsentry.crypto.keys import load_secret_key
 from bootsentry.crypto.manifest import Manifest, compute_payload_sha256
 from bootsentry.crypto.sign import sign_manifest
@@ -29,7 +32,7 @@ from bootsentry.telemetry.record import BootRecord, StageTelemetry
 def execute_attack_a5(
     base_dir: Path | str = ".",
     foreign_sku_name: str = "SKU-SERVER-RACK-8P",
-) -> Tuple[BootExecutionResult, BootRecord]:
+) -> tuple[BootExecutionResult, BootRecord]:
     """Execute Held-Out Attack A5 (Cross-SKU component transplantation)."""
     base = Path(base_dir)
     keys_dir = base / "config" / "keys"
@@ -42,7 +45,7 @@ def execute_attack_a5(
         sku_payload = (
             f"# Firmware image compiled for foreign hardware profile {foreign_sku_name}\n"
             "print('Initializing 128-core CPU NUMA topology...')"
-        ).encode("utf-8")
+        ).encode()
         digest, size = compute_payload_sha256(sku_payload)
 
         # Authentically signed by OEM root key

@@ -7,19 +7,17 @@ AI / ML anomaly scores never override or weaken these rules.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
-from bootsentry.measure.eventlog import EventLog
-from bootsentry.measure.pcr import PcrBank
 from bootsentry.telemetry.record import BootRecord
 
 
 @dataclass
 class RuleCheckResult:
     passed: bool
-    rules_triggered: List[str] = field(default_factory=list)
-    reasons: List[str] = field(default_factory=list)
-    details: Dict[str, Any] = field(default_factory=dict)
+    rules_triggered: list[str] = field(default_factory=list)
+    reasons: list[str] = field(default_factory=list)
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 class DeterministicRuleFloor:
@@ -28,8 +26,8 @@ class DeterministicRuleFloor:
     def __init__(
         self,
         min_trusted_svn: int = 5,
-        allowlisted_pcrs: Optional[Set[str]] = None,
-        required_stages: Optional[List[str]] = None,
+        allowlisted_pcrs: set[str] | None = None,
+        required_stages: list[str] | None = None,
     ):
         self.min_trusted_svn = min_trusted_svn
         self.allowlisted_pcrs = allowlisted_pcrs or set()
@@ -38,10 +36,10 @@ class DeterministicRuleFloor:
     def evaluate(
         self,
         record: BootRecord,
-        observed_svn: Optional[int] = None,
-        pcr_composite_digest: Optional[str] = None,
-        manifest_stage_id: Optional[str] = None,
-        expected_stage_id: Optional[str] = None,
+        observed_svn: int | None = None,
+        pcr_composite_digest: str | None = None,
+        manifest_stage_id: str | None = None,
+        expected_stage_id: str | None = None,
     ) -> RuleCheckResult:
         """Run all deterministic security rules."""
         triggered = []
@@ -58,21 +56,24 @@ class DeterministicRuleFloor:
             details["min_trusted_svn"] = self.min_trusted_svn
 
         # Rule 2: Allowlisted PCR Check (if allowlist configured)
-        if self.allowlisted_pcrs and pcr_composite_digest is not None:
-            if pcr_composite_digest not in self.allowlisted_pcrs:
-                triggered.append("RULE_PCR_NOT_ALLOWLISTED")
-                reasons.append(
-                    f"PCR composite measurement {pcr_composite_digest[:16]}... is not in the trusted allowlist"
-                )
-                details["pcr_composite_digest"] = pcr_composite_digest
+        if (
+            self.allowlisted_pcrs
+            and pcr_composite_digest is not None
+            and pcr_composite_digest not in self.allowlisted_pcrs
+        ):
+            triggered.append("RULE_PCR_NOT_ALLOWLISTED")
+            reasons.append(
+                f"PCR composite measurement {pcr_composite_digest[:16]}... is not in the trusted allowlist"
+            )
+            details["pcr_composite_digest"] = pcr_composite_digest
 
         # Rule 3: Stage Identity Mismatch
-        if manifest_stage_id and expected_stage_id:
-            if manifest_stage_id != expected_stage_id:
-                triggered.append("RULE_STAGE_MISMATCH")
-                reasons.append(
-                    f"Stage ID mismatch: manifest declares '{manifest_stage_id}', executing as '{expected_stage_id}'"
-                )
+        if manifest_stage_id and expected_stage_id and manifest_stage_id != expected_stage_id:
+            triggered.append("RULE_STAGE_MISMATCH")
+            reasons.append(
+                f"Stage ID mismatch: manifest declares '{manifest_stage_id}', executing as '{expected_stage_id}'"
+            )
+
 
         # Rule 4: Crypto Status Check (from Gate 1)
         if record.crypto_status not in ("PASS", "COMPLETED"):

@@ -3,13 +3,17 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+
 import joblib
 import numpy as np
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 
-from bootsentry.features.extractor import FEATURE_NAMES, NUM_FEATURES, extract_feature_matrix, extract_feature_vector
+from bootsentry.features.extractor import (
+    FEATURE_NAMES,
+    extract_feature_matrix,
+    extract_feature_vector,
+)
 from bootsentry.telemetry.record import FEATURE_VERSION, BootRecord
 
 
@@ -27,11 +31,11 @@ class IsolationForestDetector:
         self.random_state = random_state
         self.feature_version = FEATURE_VERSION
 
-        self.scaler: Optional[StandardScaler] = None
-        self.model: Optional[IsolationForest] = None
+        self.scaler: StandardScaler | None = None
+        self.model: IsolationForest | None = None
         self.score_threshold: float = 0.5  # Normalized anomaly threshold [0, 1]
 
-    def fit(self, records: List[BootRecord]) -> IsolationForestDetector:
+    def fit(self, records: list[BootRecord]) -> IsolationForestDetector:
         """Fit scaler and Isolation Forest strictly on clean normal records."""
         X = extract_feature_matrix(records)
         if X.shape[0] < 5:
@@ -75,7 +79,7 @@ class IsolationForestDetector:
         norm_score = 1.0 / (1.0 + np.exp(-12.0 * (raw_score - self.score_threshold)))
         return float(np.clip(norm_score, 0.0, 1.0))
 
-    def predict(self, record: BootRecord) -> Tuple[bool, float]:
+    def predict(self, record: BootRecord) -> tuple[bool, float]:
         """Return (is_anomalous, anomaly_score)."""
         score = self.score_record(record)
         return score >= 0.5, score

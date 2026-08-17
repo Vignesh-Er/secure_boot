@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
-SAFE_DEMO_SCENARIOS: Dict[str, Dict[str, Any]] = {
+SAFE_DEMO_SCENARIOS: dict[str, dict[str, Any]] = {
     "clean": {
         "title": "Clean Authentic Boot",
         "description": "Standard authentic boot chain with valid ML-DSA-65 signatures and normal baseline workload.",

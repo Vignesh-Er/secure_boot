@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from typing import List, Tuple
 import numpy as np
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.preprocessing import StandardScaler
@@ -22,7 +21,7 @@ class BaselineOneClassSVM:
         self.scaler: StandardScaler = StandardScaler()
         self.model: OneClassSVM = OneClassSVM(nu=nu, kernel=kernel, gamma=gamma)
 
-    def fit(self, records: List[BootRecord]) -> BaselineOneClassSVM:
+    def fit(self, records: list[BootRecord]) -> BaselineOneClassSVM:
         X = extract_feature_matrix(records)
         X_scaled = self.scaler.fit_transform(X)
         self.model.fit(X_scaled)
@@ -49,7 +48,7 @@ class BaselineLocalOutlierFactor:
             n_neighbors=n_neighbors, contamination=contamination, novelty=True
         )
 
-    def fit(self, records: List[BootRecord]) -> BaselineLocalOutlierFactor:
+    def fit(self, records: list[BootRecord]) -> BaselineLocalOutlierFactor:
         X = extract_feature_matrix(records)
         X_scaled = self.scaler.fit_transform(X)
         self.model.fit(X_scaled)

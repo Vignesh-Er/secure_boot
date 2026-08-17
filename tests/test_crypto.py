@@ -1,28 +1,25 @@
 """Unit and negative tests for BootSentry PQC Cryptographic Layer."""
 
-import hashlib
-import json
 import pytest
-from pathlib import Path
 
+from bootsentry.crypto.benchmark import benchmark_algorithm, run_all_benchmarks
 from bootsentry.crypto.keys import (
+    generate_all_system_keys,
     generate_stage_keypair,
-    save_keypair,
     load_public_key,
     load_secret_key,
-    generate_all_system_keys,
+    save_keypair,
 )
 from bootsentry.crypto.manifest import Manifest, compute_payload_sha256
 from bootsentry.crypto.provider import (
+    AlgorithmNotFoundError,
+    CryptoError,
+    MalformedKeyError,
     get_provider,
     list_supported_algorithms,
-    AlgorithmNotFoundError,
-    MalformedKeyError,
-    CryptoError,
 )
 from bootsentry.crypto.sign import sign_manifest, sign_stage_manifest_file
-from bootsentry.crypto.verify import verify_manifest, CryptoVerifyResult
-from bootsentry.crypto.benchmark import benchmark_algorithm, run_all_benchmarks
+from bootsentry.crypto.verify import verify_manifest
 
 
 class TestPQCProvider:
@@ -233,6 +230,36 @@ class TestManifestAndVerification:
         )
         assert res.success is False
         assert "failed closed" in res.reason or "not supported" in res.reason
+
+    def test_negative_empty_payload(self, valid_manifest, s1_keys):
+        m, _ = valid_manifest
+        res = verify_manifest(
+            manifest=m,
+            public_key_bytes=s1_keys.public_key_bytes,
+            payload_bytes=b"",  # Empty payload when manifest expects non-empty
+        )
+        assert res.success is False
+        assert "Payload SHA-256 digest mismatch" in res.reason
+
+    def test_negative_truncated_signature_hex(self, valid_manifest, s1_keys):
+        m, payload = valid_manifest
+        m.signature = m.signature[:32]  # Truncated hex signature
+        res = verify_manifest(
+            manifest=m,
+            public_key_bytes=s1_keys.public_key_bytes,
+            payload_bytes=payload,
+        )
+        assert res.success is False
+
+    def test_negative_malformed_public_key_bytes(self, valid_manifest):
+        m, payload = valid_manifest
+        res = verify_manifest(
+            manifest=m,
+            public_key_bytes=b"SHORT_INVALID_KEY",
+            payload_bytes=payload,
+        )
+        assert res.success is False
+
 
 
 class TestKeyStorageAndBenchmarks:

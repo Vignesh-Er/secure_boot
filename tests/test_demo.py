@@ -1,6 +1,5 @@
 """Unit tests for Rich Terminal UI and Safe Replay Mode."""
 
-import pytest
 from bootsentry.demo.safe_replay import SAFE_DEMO_SCENARIOS
 from bootsentry.demo.tui import render_bootsentry_dashboard
 
@@ -30,6 +29,7 @@ class TestDemoTUI:
             assert "attributions" in data
 
     def test_render_all_scenarios(self):
-        for s, data in SAFE_DEMO_SCENARIOS.items():
+        for _s, data in SAFE_DEMO_SCENARIOS.items():
             # Verify rendering function runs without exceptions
             render_bootsentry_dashboard(data)
+

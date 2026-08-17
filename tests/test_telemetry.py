@@ -1,10 +1,8 @@
 """Unit tests for Process Telemetry and JSONL Logger."""
 
-import pytest
-from pathlib import Path
 from bootsentry.telemetry.capture import ProcessTelemetrySampler
-from bootsentry.telemetry.logger import log_boot_record, read_boot_records, iter_boot_records
-from bootsentry.telemetry.record import BootRecord, StageTelemetry, FEATURE_VERSION
+from bootsentry.telemetry.logger import iter_boot_records, log_boot_record, read_boot_records
+from bootsentry.telemetry.record import FEATURE_VERSION, BootRecord, StageTelemetry
 
 
 class TestTelemetryCapture:

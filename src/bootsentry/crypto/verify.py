@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import time
 from dataclasses import asdict, dataclass
-from pathlib import Path
-from typing import Dict, Optional
 
 from bootsentry.crypto.manifest import Manifest
 from bootsentry.crypto.provider import CryptoError, get_provider
@@ -21,15 +20,15 @@ class CryptoVerifyResult:
     digest: str
     latency_ms: float
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         return asdict(self)
 
 
 def verify_manifest(
     manifest: Manifest,
     public_key_bytes: bytes,
-    payload_bytes: Optional[bytes] = None,
-    expected_stage_id: Optional[str] = None,
+    payload_bytes: bytes | None = None,
+    expected_stage_id: str | None = None,
 ) -> CryptoVerifyResult:
     """Deterministically verify a stage manifest and optional payload.
 
@@ -132,7 +131,7 @@ def verify_manifest(
                 latency_ms=latency_ms,
             )
 
-    except Exception as exc:
+    except (CryptoError, ValueError, TypeError, KeyError, OSError, json.JSONDecodeError, RuntimeError, AttributeError, IndexError) as exc:
         # Strict Fail-Closed behavior: any unexpected error results in failure
         latency_ms = (time.perf_counter_ns() - t0) / 1_000_000.0
         return CryptoVerifyResult(
@@ -143,3 +142,4 @@ def verify_manifest(
             digest="",
             latency_ms=latency_ms,
         )
+

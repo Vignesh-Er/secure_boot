@@ -11,12 +11,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import math
-import os
-import sys
 import tempfile
-import time
 from pathlib import Path
-from typing import List
 
 from bootsentry.boot.runner import execute_boot_chain, initialize_default_environment
 from bootsentry.telemetry.logger import log_boot_record

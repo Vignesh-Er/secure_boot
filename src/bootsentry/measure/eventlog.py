@@ -6,7 +6,7 @@ import hashlib
 import json
 import time
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from bootsentry.measure.pcr import PcrBank
 
@@ -20,7 +20,7 @@ class EventLogEntry:
     digest: str
     version: str
     timestamp_ns: int
-    event_data: Dict[str, Any] = field(default_factory=dict)
+    event_data: dict[str, Any] = field(default_factory=dict)
 
     def canonical_bytes(self) -> bytes:
         data = {
@@ -35,11 +35,11 @@ class EventLogEntry:
         }
         return json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> EventLogEntry:
+    def from_dict(cls, d: dict[str, Any]) -> EventLogEntry:
         return cls(
             sequence_number=int(d["sequence_number"]),
             stage_id=str(d["stage_id"]),
@@ -56,7 +56,7 @@ class EventLogEntry:
 class EventLog:
     """Append-only tamper-evident event log."""
 
-    entries: List[EventLogEntry] = field(default_factory=list)
+    entries: list[EventLogEntry] = field(default_factory=list)
 
     def record_event(
         self,
@@ -65,8 +65,8 @@ class EventLog:
         pcr_index: int,
         digest: str,
         version: str = "1.0.0",
-        event_data: Optional[Dict[str, Any]] = None,
-        timestamp_ns: Optional[int] = None,
+        event_data: dict[str, Any] | None = None,
+        timestamp_ns: int | None = None,
     ) -> EventLogEntry:
         """Append a new event and return the created entry."""
         seq = len(self.entries)
@@ -100,7 +100,7 @@ class EventLog:
             bank.extend(entry.pcr_index, entry.digest)
         return bank
 
-    def verify_consistency(self, pcr_bank: PcrBank) -> Tuple[bool, str]:
+    def verify_consistency(self, pcr_bank: PcrBank) -> tuple[bool, str]:
         """Verify that the event log accurately reproduces the PCR bank's register state."""
         replayed_bank = self.replay_pcrs(num_registers=pcr_bank.num_registers)
         for idx, actual_val in pcr_bank.snapshot().items():
@@ -112,9 +112,9 @@ class EventLog:
                 )
         return True, "Event log perfectly reproduces PCR bank state."
 
-    def to_list(self) -> List[Dict[str, Any]]:
+    def to_list(self) -> list[dict[str, Any]]:
         return [e.to_dict() for e in self.entries]
 
     @classmethod
-    def from_list(cls, data: List[Dict[str, Any]]) -> EventLog:
+    def from_list(cls, data: list[dict[str, Any]]) -> EventLog:
         return cls(entries=[EventLogEntry.from_dict(d) for d in data])

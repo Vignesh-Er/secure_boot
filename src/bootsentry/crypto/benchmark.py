@@ -9,10 +9,9 @@ from __future__ import annotations
 import argparse
 import statistics
 import time
-from dataclasses import asdict, dataclass
-from typing import Dict, List
+from dataclasses import dataclass
 
-from bootsentry.crypto.provider import get_provider, list_supported_algorithms
+from bootsentry.crypto.provider import CryptoError, get_provider
 
 
 @dataclass
@@ -35,9 +34,9 @@ def benchmark_algorithm(algorithm: str, iterations: int = 10) -> CryptoBenchmark
     provider = get_provider(algorithm)
     message = b"BootSentry stage integrity manifest canonical test payload measurement string"
 
-    keygen_times: List[float] = []
-    sign_times: List[float] = []
-    verify_times: List[float] = []
+    keygen_times: list[float] = []
+    sign_times: list[float] = []
+    verify_times: list[float] = []
 
     pk_bytes, sk_bytes, sig_bytes = b"", b"", b""
 
@@ -76,7 +75,7 @@ def benchmark_algorithm(algorithm: str, iterations: int = 10) -> CryptoBenchmark
     )
 
 
-def run_all_benchmarks(iterations: int = 10) -> List[CryptoBenchmarkResult]:
+def run_all_benchmarks(iterations: int = 10) -> list[CryptoBenchmarkResult]:
     """Run benchmarks across all available ML-DSA algorithms."""
     algorithms = ["ML-DSA-44", "ML-DSA-65", "ML-DSA-87"]
     results = []
@@ -84,9 +83,10 @@ def run_all_benchmarks(iterations: int = 10) -> List[CryptoBenchmarkResult]:
         try:
             res = benchmark_algorithm(alg, iterations=iterations)
             results.append(res)
-        except Exception as exc:
+        except (CryptoError, ValueError, TypeError, OSError, RuntimeError) as exc:
             print(f"[-] Benchmark failed for {alg}: {exc}")
     return results
+
 
 
 def main() -> None:

@@ -1,7 +1,11 @@
 """Boot subsystem exports."""
 
 from bootsentry.boot.handoff import BootHandoff
-from bootsentry.boot.runner import BootExecutionResult, execute_boot_chain, initialize_default_environment
+from bootsentry.boot.runner import (
+    BootExecutionResult,
+    execute_boot_chain,
+    initialize_default_environment,
+)
 from bootsentry.boot.s0_bootrom import run_stage_0
 from bootsentry.boot.s1_bootloader import run_stage_1
 from bootsentry.boot.s2_kernel import run_stage_2

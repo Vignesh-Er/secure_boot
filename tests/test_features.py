@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+
 from bootsentry.features.extractor import (
     FEATURE_NAMES,
     NUM_FEATURES,
@@ -47,7 +48,8 @@ class TestFeatureExtractor:
         assert len(f_dict) == 28
         for name in FEATURE_NAMES:
             assert name in f_dict
-            assert isinstance(f_dict[name], (int, float))
+            assert isinstance(f_dict[name], int | float)
+
 
         assert f_dict["t_verify_s0"] == 10.0
         assert f_dict["t_verify_s1"] == 15.0

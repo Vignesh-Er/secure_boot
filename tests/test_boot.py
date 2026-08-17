@@ -1,12 +1,9 @@
 """Integration tests for the 4-Stage Secure Boot Chain (S0 -> S1 -> S2 -> S3)."""
 
-import json
 import pytest
-from pathlib import Path
 
 from bootsentry.boot.handoff import BootHandoff
 from bootsentry.boot.runner import execute_boot_chain, initialize_default_environment
-from bootsentry.boot.services import SERVICE_REGISTRY
 from bootsentry.crypto.manifest import Manifest
 
 

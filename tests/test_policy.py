@@ -1,8 +1,9 @@
 """Unit tests for Deterministic Rules and Policy Engine (Invariant 3 validation)."""
 
 import pytest
+
 from bootsentry.detect.attribution import FeatureAttribution
-from bootsentry.detect.policy import BootPolicyEngine, PolicyDecision
+from bootsentry.detect.policy import BootPolicyEngine
 from bootsentry.detect.rules import DeterministicRuleFloor, RuleCheckResult
 from bootsentry.telemetry.record import BootRecord
 
@@ -87,16 +88,36 @@ class TestPolicyEngine:
         assert decision.crypto_status == "PASS"
         assert len(decision.top_attributions) == 1
 
-    def test_policy_halt_on_deterministic_rule_violation(self, policy_engine):
-        rule_res = RuleCheckResult(
-            passed=False,
-            rules_triggered=["RULE_SVN_ROLLBACK"],
-            reasons=["Security Version Rollback: observed SVN=3 < trusted SVN=5"],
-        )
-        decision = policy_engine.decide(
-            rule_result=rule_res,
-            if_score=0.85,
-        )
-        assert decision.verdict == "HALT"
-        assert decision.attestation_status == "UNTRUSTED"
-        assert "RULE_SVN_ROLLBACK" in decision.rules_triggered
+    def test_policy_isolated_if_anomaly_produces_warn(self, policy_engine):
+        rule_res = RuleCheckResult(passed=True)
+        decision = policy_engine.decide(rule_result=rule_res, if_score=0.95, markov_score=0.1, drift_score=0.1)
+        assert decision.verdict == "WARN"
+        assert decision.attestation_status == "REDUCED_TRUST"
+
+    def test_policy_isolated_markov_anomaly_produces_warn(self, policy_engine):
+        rule_res = RuleCheckResult(passed=True)
+        decision = policy_engine.decide(rule_result=rule_res, if_score=0.1, markov_score=0.95, drift_score=0.1)
+        assert decision.verdict == "WARN"
+        assert decision.attestation_status == "REDUCED_TRUST"
+
+    def test_policy_isolated_ewma_anomaly_produces_warn(self, policy_engine):
+        rule_res = RuleCheckResult(passed=True)
+        decision = policy_engine.decide(rule_result=rule_res, if_score=0.1, markov_score=0.1, drift_score=0.95)
+        assert decision.verdict == "WARN"
+        assert decision.attestation_status == "REDUCED_TRUST"
+
+    def test_policy_halt_on_all_individual_rules(self, policy_engine):
+        rule_names = [
+            "RULE_SVN_ROLLBACK",
+            "RULE_PCR_NOT_ALLOWLISTED",
+            "RULE_STAGE_MISMATCH",
+            "RULE_CRYPTO_VERIFICATION_FAILED",
+            "RULE_MEASUREMENT_VERIFICATION_FAILED",
+        ]
+        for r_name in rule_names:
+            rule_res = RuleCheckResult(passed=False, rules_triggered=[r_name], reasons=[f"Violation of {r_name}"])
+            decision = policy_engine.decide(rule_result=rule_res, if_score=0.1)
+            assert decision.verdict == "HALT"
+            assert decision.attestation_status == "UNTRUSTED"
+            assert r_name in decision.rules_triggered
+

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+
 import joblib
 import numpy as np
 
@@ -39,11 +39,11 @@ class EWMADriftMonitor:
         self.ewma_score: float = self.baseline_mean_score
         self.cusum_pos: float = 0.0
         self.cusum_neg: float = 0.0
-        self.history_scores: List[float] = []
-        self.history_times: List[float] = []
+        self.history_scores: list[float] = []
+        self.history_times: list[float] = []
 
     def fit(
-        self, records: List[BootRecord], if_scores: Optional[List[float]] = None
+        self, records: list[BootRecord], if_scores: list[float] | None = None
     ) -> EWMADriftMonitor:
         """Fit baseline parameters from normal training history."""
         times = [r.total_boot_time_ms for r in records if r.total_boot_time_ms > 0]
@@ -69,7 +69,7 @@ class EWMADriftMonitor:
         self.history_scores = []
         self.history_times = []
 
-    def update(self, record: BootRecord, current_if_score: float = 0.0) -> Tuple[bool, float, Dict[str, float]]:
+    def update(self, record: BootRecord, current_if_score: float = 0.0) -> tuple[bool, float, dict[str, float]]:
         """Update sequential monitor with current boot and calculate drift anomaly score [0, 1]."""
         t = record.total_boot_time_ms
         s = current_if_score

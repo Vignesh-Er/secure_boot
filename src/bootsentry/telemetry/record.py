@@ -5,8 +5,7 @@ from __future__ import annotations
 import datetime
 import json
 from dataclasses import asdict, dataclass, field
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 FEATURE_VERSION = 1
 
@@ -26,7 +25,7 @@ class StageTelemetry:
     io_bytes_written: int = 0
     cpu_user_ms: float = 0.0
     cpu_system_ms: float = 0.0
-    custom_metrics: Dict[str, Any] = field(default_factory=dict)
+    custom_metrics: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -39,13 +38,13 @@ class BootRecord:
     crypto_status: str = "PASS"  # "PASS" or "FAIL"
     measurement_status: str = "PASS"  # "PASS" or "FAIL"
     total_boot_time_ms: float = 0.0
-    stages: Dict[str, StageTelemetry] = field(default_factory=dict)
-    event_sequence: List[str] = field(default_factory=list)
-    pcr_snapshot: Dict[str, str] = field(default_factory=dict)
-    feature_vector: Dict[str, float] = field(default_factory=dict)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    stages: dict[str, StageTelemetry] = field(default_factory=dict)
+    event_sequence: list[str] = field(default_factory=list)
+    pcr_snapshot: dict[str, str] = field(default_factory=dict)
+    feature_vector: dict[str, float] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
         return d
 
@@ -53,7 +52,7 @@ class BootRecord:
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> BootRecord:
+    def from_dict(cls, data: dict[str, Any]) -> BootRecord:
         stages_data = data.get("stages", {})
         stages_obj = {k: StageTelemetry(**v) for k, v in stages_data.items()}
 

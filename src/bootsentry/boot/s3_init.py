@@ -3,12 +3,9 @@
 from __future__ import annotations
 
 import argparse
-import json
-import os
 import sys
 import time
 from pathlib import Path
-from typing import List, Optional
 
 from bootsentry.boot.handoff import BootHandoff
 from bootsentry.boot.services import DEFAULT_SERVICE_SEQUENCE, SERVICE_REGISTRY
@@ -21,7 +18,7 @@ def run_stage_3(
     keys_dir: Path | str,
     stages_dir: Path | str,
     run_dir: Path | str,
-    service_sequence: Optional[List[str]] = None,
+    service_sequence: list[str] | None = None,
 ) -> BootHandoff:
     """Execute Stage 3 (Init).
 
@@ -33,8 +30,8 @@ def run_stage_3(
     """
     t_start = time.perf_counter_ns()
     keys_path = Path(keys_dir)
-    stages_path = Path(stages_dir)
     run_path = Path(run_dir)
+
 
     handoff = BootHandoff.load(handoff_path)
     if handoff.status == "HALTED":

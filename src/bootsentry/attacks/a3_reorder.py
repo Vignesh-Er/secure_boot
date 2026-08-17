@@ -16,16 +16,20 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import List, Tuple
 
-from bootsentry.boot.runner import BootExecutionResult, execute_boot_chain, initialize_default_environment
+from bootsentry.boot.runner import (
+    BootExecutionResult,
+    execute_boot_chain,
+    initialize_default_environment,
+)
 from bootsentry.telemetry.record import BootRecord, StageTelemetry
 
 
 def execute_attack_a3(
     base_dir: Path | str = ".",
-    reordered_sequence: Optional[List[str]] = None,
-) -> Tuple[BootExecutionResult, BootRecord]:
+    reordered_sequence: list[str] | None = None,
+) -> tuple[BootExecutionResult, BootRecord]:
+
     """Execute Attack A3 (Signed Service Reorder)."""
     base = Path(base_dir)
     keys_dir = base / "config" / "keys"

@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
-import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
+from sklearn.metrics import (
+    average_precision_score,
+    roc_auc_score,
+    roc_curve,
+)
 
 from bootsentry.attacks.a1_downgrade import execute_attack_a1
 from bootsentry.attacks.a2_toctou import execute_attack_a2
@@ -22,22 +25,17 @@ from bootsentry.attacks.benign_controls import (
     execute_benign_firmware_upgrade,
 )
 from bootsentry.detect.attribution import AttributionEngine
-from bootsentry.detect.baseline import BaselineLocalOutlierFactor, BaselineOneClassSVM
 from bootsentry.detect.ewma import EWMADriftMonitor
 from bootsentry.detect.isolation_forest import IsolationForestDetector
 from bootsentry.detect.markov import MarkovSequenceDetector
-from bootsentry.detect.policy import BootPolicyEngine, PolicyDecision
+from bootsentry.detect.policy import BootPolicyEngine
 from bootsentry.detect.rules import DeterministicRuleFloor
 from bootsentry.telemetry.logger import read_boot_records
-from bootsentry.telemetry.record import BootRecord
-
-
-from sklearn.metrics import average_precision_score, precision_recall_curve, roc_auc_score, roc_curve
 
 
 def compute_roc_pr_metrics(
     y_true: np.ndarray, y_scores: np.ndarray
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Compute PR-AUC, ROC-AUC, and FPR at 95% TPR."""
     n_pos = int(np.sum(y_true))
     n_neg = len(y_true) - n_pos
@@ -66,7 +64,7 @@ def run_comprehensive_evaluation(
     data_file: Path | str = "data/telemetry/normal_boots.jsonl",
     out_dir: Path | str = "eval",
     base_dir: Path | str = ".",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Run full benchmark evaluation across test set, all attacks, and benign controls."""
     models_path = Path(models_dir)
     out_path = Path(out_dir)
@@ -83,9 +81,9 @@ def run_comprehensive_evaluation(
     all_normal = read_boot_records(data_file)
     test_normal = all_normal[int(len(all_normal) * 0.8) :] if len(all_normal) > 10 else all_normal
 
-    y_true: List[int] = []
-    y_scores: List[float] = []
-    decisions: List[Dict[str, Any]] = []
+    y_true: list[int] = []
+    y_scores: list[float] = []
+    decisions: list[dict[str, Any]] = []
 
     benign_halts = 0
 
@@ -207,7 +205,7 @@ def run_comprehensive_evaluation(
     return metrics
 
 
-def generate_html_report(metrics: Dict[str, Any], out_file: Path) -> None:
+def generate_html_report(metrics: dict[str, Any], out_file: Path) -> None:
     """Generate comprehensive judge-facing HTML report with visual scorecards."""
     pr_auc = metrics.get("pr_auc", 0.98)
     roc_auc = metrics.get("roc_auc", 0.99)
@@ -254,9 +252,10 @@ def generate_html_report(metrics: Dict[str, Any], out_file: Path) -> None:
 <body>
     <div class="container">
         <h1>BootSentry Evaluation Report</h1>
-        <div class="subtitle">AI-Assisted Secure Boot & Integrity Verification — Post-Quantum ML-DSA-65 & Multi-Gate Telemetry</div>
-        
+        <div class="subtitle">AI-Assisted Secure Boot & Integrity Verification -- Post-Quantum ML-DSA-65 & Multi-Gate Telemetry</div>
+
         <div class="grid">
+
             <div class="card">
                 <div class="metric-val">{pr_auc:.3f}</div>
                 <div class="metric-label">PR-AUC</div>

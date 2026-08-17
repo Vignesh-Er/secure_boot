@@ -6,7 +6,7 @@ import hashlib
 import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 
 @dataclass
@@ -18,10 +18,10 @@ class Manifest:
     payload_sha256: str
     payload_size: int
     expected_pcr: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    signature: Optional[str] = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+    signature: str | None = None
 
-    def canonical_dict(self) -> Dict[str, Any]:
+    def canonical_dict(self) -> dict[str, Any]:
         """Return the dictionary representation for signing (signature excluded)."""
         d = asdict(self)
         d.pop("signature", None)
@@ -53,7 +53,7 @@ class Manifest:
             f.write(self.to_json())
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> Manifest:
+    def from_dict(cls, data: dict[str, Any]) -> Manifest:
         """Construct Manifest from a dictionary."""
         return cls(
             stage_id=str(data["stage_id"]),
@@ -73,15 +73,16 @@ class Manifest:
         file_path = Path(path)
         if not file_path.exists():
             raise FileNotFoundError(f"Manifest file not found: {file_path}")
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             data = json.load(f)
         return cls.from_dict(data)
 
 
-def compute_payload_sha256(payload_data_or_path: bytes | str | Path) -> Tuple[str, int]:
+def compute_payload_sha256(payload_data_or_path: bytes | str | Path) -> tuple[str, int]:
     """Compute (sha256_hex, size_bytes) for payload bytes or file."""
-    if isinstance(payload_data_or_path, (str, Path)):
+    if isinstance(payload_data_or_path, str | Path):
         p = Path(payload_data_or_path)
+
         if not p.exists():
             raise FileNotFoundError(f"Payload not found: {p}")
         data = p.read_bytes()

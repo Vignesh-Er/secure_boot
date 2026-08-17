@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 import collections
-import json
 import math
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
 
 import joblib
 
@@ -22,22 +20,22 @@ class MarkovSequenceDetector:
 
     def __init__(self, laplace_alpha: float = 1.0):
         self.laplace_alpha = laplace_alpha
-        self.states: Set[str] = set()
-        self.transition_counts: Dict[str, Dict[str, int]] = collections.defaultdict(
+        self.states: set[str] = set()
+        self.transition_counts: dict[str, dict[str, int]] = collections.defaultdict(
             lambda: collections.defaultdict(int)
         )
-        self.start_counts: Dict[str, int] = collections.defaultdict(int)
+        self.start_counts: dict[str, int] = collections.defaultdict(int)
         self.total_sequences: int = 0
         self.threshold_nll: float = 3.0  # Mean negative log likelihood threshold
 
-    def fit(self, records: List[BootRecord]) -> MarkovSequenceDetector:
+    def fit(self, records: list[BootRecord]) -> MarkovSequenceDetector:
         """Fit transition matrix on normal boot event sequences."""
         self.states = set()
         self.transition_counts = collections.defaultdict(lambda: collections.defaultdict(int))
         self.start_counts = collections.defaultdict(int)
         self.total_sequences = len(records)
 
-        all_nlls: List[float] = []
+        all_nlls: list[float] = []
 
         for rec in records:
             seq = rec.event_sequence
@@ -72,7 +70,7 @@ class MarkovSequenceDetector:
         prob = (count_from_to + self.laplace_alpha) / (total_from + self.laplace_alpha * num_states)
         return prob
 
-    def compute_nll(self, sequence: List[str]) -> Tuple[float, List[Tuple[str, str, float]]]:
+    def compute_nll(self, sequence: list[str]) -> tuple[float, list[tuple[str, str, float]]]:
         """Compute Mean Negative Log-Likelihood and list of transition probabilities."""
         if len(sequence) < 2:
             return 0.0, []

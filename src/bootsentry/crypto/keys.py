@@ -4,10 +4,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 from bootsentry.crypto.provider import CryptoError, MalformedKeyError, get_provider
 
@@ -27,10 +25,10 @@ class PQCKeypair:
     def secret_key_bytes(self) -> bytes:
         return bytes.fromhex(self.secret_key_hex)
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         return asdict(self)
 
-    def public_dict(self) -> Dict[str, str]:
+    def public_dict(self) -> dict[str, str]:
         return {
             "stage_id": self.stage_id,
             "algorithm": self.algorithm,
@@ -50,7 +48,7 @@ def generate_stage_keypair(stage_id: str, algorithm: str = "ML-DSA-65") -> PQCKe
     )
 
 
-def save_keypair(keypair: PQCKeypair, out_dir: Path | str) -> Tuple[Path, Path]:
+def save_keypair(keypair: PQCKeypair, out_dir: Path | str) -> tuple[Path, Path]:
     """Save keypair to JSON files (private key with restricted permissions, public key separate)."""
     dir_path = Path(out_dir)
     dir_path.mkdir(parents=True, exist_ok=True)
@@ -67,13 +65,13 @@ def save_keypair(keypair: PQCKeypair, out_dir: Path | str) -> Tuple[Path, Path]:
     return priv_file, pub_file
 
 
-def load_public_key(pub_file: Path | str) -> Tuple[str, str, bytes]:
+def load_public_key(pub_file: Path | str) -> tuple[str, str, bytes]:
     """Load public key returning (stage_id, algorithm, public_key_bytes)."""
     path = Path(pub_file)
     if not path.exists():
         raise CryptoError(f"Public key file not found: {path}")
 
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         data = json.load(f)
 
     stage_id = data.get("stage_id", "UNKNOWN")
@@ -85,13 +83,13 @@ def load_public_key(pub_file: Path | str) -> Tuple[str, str, bytes]:
     return stage_id, algorithm, bytes.fromhex(pk_hex)
 
 
-def load_secret_key(priv_file: Path | str) -> Tuple[str, str, bytes]:
+def load_secret_key(priv_file: Path | str) -> tuple[str, str, bytes]:
     """Load secret key returning (stage_id, algorithm, secret_key_bytes)."""
     path = Path(priv_file)
     if not path.exists():
         raise CryptoError(f"Private key file not found: {path}")
 
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         data = json.load(f)
 
     stage_id = data.get("stage_id", "UNKNOWN")
@@ -105,7 +103,7 @@ def load_secret_key(priv_file: Path | str) -> Tuple[str, str, bytes]:
 
 def generate_all_system_keys(
     out_dir: Path | str, algorithm: str = "ML-DSA-65"
-) -> Dict[str, PQCKeypair]:
+) -> dict[str, PQCKeypair]:
     """Generate all cryptographic keys for BootSentry stages and attestation."""
     stages = ["S0", "S1", "S2", "S3", "ATTEST"]
     keypairs = {}

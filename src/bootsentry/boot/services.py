@@ -10,7 +10,6 @@ import hashlib
 import json
 import math
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
 
 
 @dataclass
@@ -18,7 +17,7 @@ class ServiceExecutionResult:
     name: str
     digest: str
     status: str
-    details: Dict[str, object]
+    details: dict[str, object]
 
 
 def run_svc_a() -> ServiceExecutionResult:
@@ -160,4 +159,4 @@ SERVICE_REGISTRY = {
     "svc_diag": run_svc_diag,
 }
 
-DEFAULT_SERVICE_SEQUENCE: List[str] = ["svc_a", "svc_b", "svc_c", "svc_attest", "svc_e"]
+DEFAULT_SERVICE_SEQUENCE: list[str] = ["svc_a", "svc_b", "svc_c", "svc_attest", "svc_e"]

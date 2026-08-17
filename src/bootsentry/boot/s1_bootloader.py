@@ -9,7 +9,6 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Optional
 
 from bootsentry.boot.handoff import BootHandoff
 from bootsentry.crypto.keys import load_public_key

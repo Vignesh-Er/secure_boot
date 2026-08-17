@@ -24,8 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-cov ruff
+        pip install -e ".[dev]"
 
     - name: Lint with ruff
       run: |
@@ -37,4 +36,12 @@ jobs:
 
     - name: Verify PQC ML-DSA-65 Benchmarks
       run: |
-        python -m bootsentry.crypto.benchmark
+        python -m bootsentry.crypto.benchmark --iterations 2
+
+    - name: Smoke test Rich TUI Demonstrator (Safe Replay)
+      run: |
+        python -m bootsentry.demo.tui --scenario clean
+        python -m bootsentry.demo.tui --scenario a1_downgrade
+        python -m bootsentry.demo.tui --scenario a2_toctou
+        python -m bootsentry.demo.tui --scenario a5_cross_sku
+

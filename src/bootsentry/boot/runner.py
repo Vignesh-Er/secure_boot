@@ -3,18 +3,15 @@
 from __future__ import annotations
 
 import argparse
-import os
-import shutil
-import sys
 import time
 import uuid
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from bootsentry.boot.handoff import BootHandoff
 from bootsentry.boot.s0_bootrom import run_stage_0
-from bootsentry.crypto.keys import generate_all_system_keys, save_keypair
+from bootsentry.crypto.keys import generate_all_system_keys
 from bootsentry.crypto.manifest import Manifest, compute_payload_sha256
 from bootsentry.crypto.sign import sign_manifest
 from bootsentry.measure.eventlog import EventLog
@@ -26,15 +23,15 @@ from bootsentry.measure.quote import AttestationQuote
 class BootExecutionResult:
     boot_id: str
     status: str  # "COMPLETED" or "HALTED"
-    error_message: Optional[str]
+    error_message: str | None
     pcr_bank: PcrBank
     event_log: EventLog
-    quote: Optional[AttestationQuote]
-    stage_metrics: Dict[str, Any]
+    quote: AttestationQuote | None
+    stage_metrics: dict[str, Any]
     total_boot_time_ms: float
     handoff: BootHandoff
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "boot_id": self.boot_id,
             "status": self.status,
@@ -49,9 +46,9 @@ class BootExecutionResult:
 
 def initialize_default_environment(
     base_dir: Path | str = ".",
-    algorithm: str = "ML-DSA-65",
-) -> Tuple[Path, Path]:
-    """Ensure standard keys and signed stage manifests exist in config/."""
+    default_algorithm: str = "ML-DSA-65",
+) -> tuple[Path, Path]:
+    """Ensure standard keys and signed stage manifests exist for clean boot."""
     base = Path(base_dir)
     keys_dir = base / "config" / "keys"
     stages_dir = base / "config" / "stages"
@@ -60,11 +57,8 @@ def initialize_default_environment(
     stages_dir.mkdir(parents=True, exist_ok=True)
 
     # 1. Generate keys if not present
-    s0_priv = keys_dir / "s0_private.json"
-    if not s0_priv.exists():
-        kps = generate_all_system_keys(keys_dir, algorithm=algorithm)
-    else:
-        kps = {}
+    if not (keys_dir / "s0_public.json").exists():
+        generate_all_system_keys(keys_dir, algorithm=default_algorithm)
 
     # 2. Generate and sign standard stages S1, S2, S3
     stage_configs = [
@@ -93,14 +87,15 @@ def initialize_default_environment(
                 stage_id=stage_id,
                 version=ver,
                 security_version_counter=svn,
-                algorithm=algorithm,
+                algorithm=default_algorithm,
                 payload_sha256=digest,
                 payload_size=size,
                 expected_pcr="0" * 64,
                 metadata={"description": f"Standard {stage_id} component"},
             )
-            signed_m = sign_manifest(m, sk_bytes, algorithm=algorithm)
+            signed_m = sign_manifest(m, sk_bytes, algorithm=default_algorithm)
             signed_m.save(manifest_file)
+
 
     return keys_dir, stages_dir
 
@@ -109,8 +104,8 @@ def execute_boot_chain(
     keys_dir: Path | str = "config/keys",
     stages_dir: Path | str = "config/stages",
     run_dir: Path | str = "run",
-    boot_id: Optional[str] = None,
-    service_sequence: Optional[List[str]] = None,
+    boot_id: str | None = None,
+    service_sequence: list[str] | None = None,
 ) -> BootExecutionResult:
     """Execute the complete 4-stage boot chain (S0 -> S1 -> S2 -> S3)."""
     t0 = time.perf_counter_ns()

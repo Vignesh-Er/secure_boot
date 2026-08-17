@@ -1,6 +1,10 @@
 """BootSentry Cryptographic Subsystem."""
 
-from bootsentry.crypto.benchmark import CryptoBenchmarkResult, benchmark_algorithm, run_all_benchmarks
+from bootsentry.crypto.benchmark import (
+    CryptoBenchmarkResult,
+    benchmark_algorithm,
+    run_all_benchmarks,
+)
 from bootsentry.crypto.keys import (
     PQCKeypair,
     generate_all_system_keys,

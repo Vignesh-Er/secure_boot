@@ -5,30 +5,21 @@ from __future__ import annotations
 import argparse
 import sys
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from rich.align import Align
 from rich.box import ROUNDED
 from rich.console import Console, Group
-from rich.layout import Layout
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from bootsentry.attacks.a1_downgrade import execute_attack_a1
-from bootsentry.attacks.a2_toctou import execute_attack_a2
-from bootsentry.attacks.a3_reorder import execute_attack_a3
-from bootsentry.attacks.a4_drift import execute_attack_a4_sequence
-from bootsentry.attacks.a5_cross_sku import execute_attack_a5
-from bootsentry.attacks.benign_controls import execute_benign_cpu_load
-from bootsentry.boot.runner import execute_boot_chain, initialize_default_environment
 from bootsentry.demo.safe_replay import SAFE_DEMO_SCENARIOS
-
 
 console = Console()
 
 
-def render_bootsentry_dashboard(scenario_data: Dict[str, Any]) -> None:
+def render_bootsentry_dashboard(scenario_data: dict[str, Any]) -> None:
     """Render the full Rich 4-panel dashboard for a boot scenario."""
     title = scenario_data.get("title", "BootSentry Verification")
     description = scenario_data.get("description", "")

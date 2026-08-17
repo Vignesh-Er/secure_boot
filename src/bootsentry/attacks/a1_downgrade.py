@@ -15,13 +15,15 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import Tuple
 
-from bootsentry.boot.runner import BootExecutionResult, execute_boot_chain, initialize_default_environment
+from bootsentry.boot.runner import (
+    BootExecutionResult,
+    execute_boot_chain,
+    initialize_default_environment,
+)
 from bootsentry.crypto.keys import load_secret_key
 from bootsentry.crypto.manifest import Manifest, compute_payload_sha256
 from bootsentry.crypto.sign import sign_manifest
-from bootsentry.detect.rules import DeterministicRuleFloor
 from bootsentry.telemetry.record import BootRecord
 
 
@@ -29,7 +31,7 @@ def execute_attack_a1(
     base_dir: Path | str = ".",
     trusted_min_svn: int = 5,
     downgrade_svn: int = 3,
-) -> Tuple[BootExecutionResult, BootRecord, int]:
+) -> tuple[BootExecutionResult, BootRecord, int]:
     """Execute Attack A1 (Signed Downgrade) on Stage 2 Kernel."""
     base = Path(base_dir)
     keys_dir = base / "config" / "keys"

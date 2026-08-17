@@ -9,9 +9,8 @@ Enforces Non-Negotiable Security Invariant 3:
 
 from __future__ import annotations
 
-import json
-from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass, field
+from typing import Any
 
 from bootsentry.detect.attribution import FeatureAttribution
 from bootsentry.detect.rules import RuleCheckResult
@@ -24,12 +23,12 @@ class PolicyDecision:
     risk_score: float  # Composite risk score in [0.0, 1.0]
     crypto_status: str  # "PASS" or "FAIL"
     measurement_status: str  # "PASS" or "FAIL"
-    rules_triggered: List[str] = field(default_factory=list)
-    detector_scores: Dict[str, float] = field(default_factory=dict)
-    top_attributions: List[FeatureAttribution] = field(default_factory=list)
+    rules_triggered: list[str] = field(default_factory=list)
+    detector_scores: dict[str, float] = field(default_factory=dict)
+    top_attributions: list[FeatureAttribution] = field(default_factory=list)
     attestation_status: str = "TRUSTED"  # "TRUSTED", "REDUCED_TRUST", "UNTRUSTED"
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "verdict": self.verdict,
             "reason": self.reason,
@@ -62,7 +61,7 @@ class BootPolicyEngine:
         if_score: float = 0.0,
         markov_score: float = 0.0,
         drift_score: float = 0.0,
-        attributions: Optional[List[FeatureAttribution]] = None,
+        attributions: list[FeatureAttribution] | None = None,
     ) -> PolicyDecision:
         """Calculate final policy decision with strict invariant enforcement."""
         detector_scores = {

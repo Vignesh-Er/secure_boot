@@ -17,9 +17,12 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import List, Tuple
 
-from bootsentry.boot.runner import BootExecutionResult, execute_boot_chain, initialize_default_environment
+from bootsentry.boot.runner import (
+    BootExecutionResult,
+    execute_boot_chain,
+    initialize_default_environment,
+)
 from bootsentry.telemetry.record import BootRecord, StageTelemetry
 
 
@@ -27,7 +30,7 @@ def execute_attack_a4_sequence(
     base_dir: Path | str = ".",
     num_boots: int = 20,
     drift_step_ms: float = 4.0,
-) -> List[Tuple[BootExecutionResult, BootRecord]]:
+) -> list[tuple[BootExecutionResult, BootRecord]]:
     """Execute a 20-boot sequential Slow-Drip Drift Attack."""
     base = Path(base_dir)
     keys_dir = base / "config" / "keys"
@@ -35,7 +38,7 @@ def execute_attack_a4_sequence(
 
     initialize_default_environment(base_dir=base)
 
-    results: List[Tuple[BootExecutionResult, BootRecord]] = []
+    results: list[tuple[BootExecutionResult, BootRecord]] = []
 
     with tempfile.TemporaryDirectory() as tmp_run:
         for boot_idx in range(num_boots):

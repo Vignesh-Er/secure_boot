@@ -1,8 +1,8 @@
 """Unit tests for Data Collection, Model Training, and Evaluation."""
 
+
 import numpy as np
 import pytest
-from pathlib import Path
 
 from bootsentry.boot.runner import initialize_default_environment
 from bootsentry.eval.collector import collect_single_real_boot, run_data_collection
@@ -49,10 +49,12 @@ class TestEvaluationPipeline:
 
         # 2. Train models
         model_paths = train_all_models(data_file=data_file, models_dir=models_dir)
+        assert len(model_paths) == 4
         assert (models_dir / "isolation_forest.joblib").exists()
         assert (models_dir / "markov_sequence.joblib").exists()
         assert (models_dir / "ewma_monitor.joblib").exists()
         assert (models_dir / "attribution_engine.joblib").exists()
+
 
         # 3. Run full evaluation
         metrics = run_comprehensive_evaluation(

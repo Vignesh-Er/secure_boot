@@ -4,21 +4,18 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 from bootsentry.detect.attribution import AttributionEngine
-from bootsentry.detect.baseline import BaselineLocalOutlierFactor, BaselineOneClassSVM
 from bootsentry.detect.ewma import EWMADriftMonitor
 from bootsentry.detect.isolation_forest import IsolationForestDetector
 from bootsentry.detect.markov import MarkovSequenceDetector
 from bootsentry.telemetry.logger import read_boot_records
-from bootsentry.telemetry.record import BootRecord
 
 
 def train_all_models(
     data_file: Path | str = "data/telemetry/normal_boots.jsonl",
     models_dir: Path | str = "models",
-) -> Dict[str, Path]:
+) -> dict[str, Path]:
     """Train all behavioral anomaly detection models strictly on clean baseline telemetry."""
     data_path = Path(data_file)
     models_path = Path(models_dir)

@@ -3,19 +3,17 @@
 from __future__ import annotations
 
 import argparse
-import time
 from pathlib import Path
-from typing import Optional
 
 from bootsentry.crypto.keys import load_secret_key
 from bootsentry.crypto.manifest import Manifest
-from bootsentry.crypto.provider import CryptoError, get_provider
+from bootsentry.crypto.provider import get_provider
 
 
 def sign_manifest(
     manifest: Manifest,
     secret_key_bytes: bytes,
-    algorithm: Optional[str] = None,
+    algorithm: str | None = None,
 ) -> Manifest:
     """Sign the canonical manifest representation with the specified secret key."""
     alg = algorithm or manifest.algorithm
@@ -31,7 +29,7 @@ def sign_manifest(
 def sign_stage_manifest_file(
     manifest_path: Path | str,
     private_key_path: Path | str,
-    out_path: Optional[Path | str] = None,
+    out_path: Path | str | None = None,
 ) -> Manifest:
     """Load manifest and private key, compute PQC signature, and save signed manifest."""
     manifest = Manifest.load(manifest_path)

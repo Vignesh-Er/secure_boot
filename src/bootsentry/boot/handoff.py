@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from bootsentry.measure.eventlog import EventLog
 from bootsentry.measure.pcr import PcrBank
@@ -16,12 +16,12 @@ class BootHandoff:
     boot_id: str
     current_stage: str
     next_stage: str
-    pcr_state: Dict[str, str]
-    event_log_data: List[Dict[str, Any]]
+    pcr_state: dict[str, str]
+    event_log_data: list[dict[str, Any]]
     status: str = "RUNNING"
-    error_message: Optional[str] = None
-    stage_metrics: Dict[str, Any] = field(default_factory=dict)
-    quote_data: Optional[Dict[str, Any]] = None
+    error_message: str | None = None
+    stage_metrics: dict[str, Any] = field(default_factory=dict)
+    quote_data: dict[str, Any] | None = None
 
     def get_pcr_bank(self) -> PcrBank:
         return PcrBank.from_dict(self.pcr_state)
@@ -29,7 +29,7 @@ class BootHandoff:
     def get_event_log(self) -> EventLog:
         return EventLog.from_list(self.event_log_data)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
     def save(self, file_path: Path | str) -> None:
@@ -45,7 +45,7 @@ class BootHandoff:
         path = Path(file_path)
         if not path.exists():
             raise FileNotFoundError(f"Handoff file not found: {path}")
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             data = json.load(f)
         return cls(
             boot_id=str(data["boot_id"]),

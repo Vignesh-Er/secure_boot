@@ -1,10 +1,10 @@
 """Unit tests for Detection Engine (Isolation Forest, Markov, EWMA, Attribution, Baseline)."""
 
+
 import numpy as np
 import pytest
-from pathlib import Path
 
-from bootsentry.detect.attribution import AttributionEngine, FeatureAttribution
+from bootsentry.detect.attribution import AttributionEngine
 from bootsentry.detect.baseline import BaselineLocalOutlierFactor, BaselineOneClassSVM
 from bootsentry.detect.ewma import EWMADriftMonitor
 from bootsentry.detect.isolation_forest import IsolationForestDetector
@@ -154,7 +154,7 @@ class TestAttributionEngine:
         top_names = [a.feature_name for a in top_attrs]
         assert "t_exec_s2" in top_names or "t_total_boot" in top_names
         assert "+" in top_attrs[0].formatted_sigma
-        assert "σ" in top_attrs[0].formatted_sigma
+        assert "sigma" in top_attrs[0].formatted_sigma
 
 
 class TestBaselines:

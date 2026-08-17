@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from bootsentry.attacks.a1_downgrade import execute_attack_a1
 from bootsentry.attacks.a2_toctou import execute_attack_a2
@@ -16,14 +16,10 @@ from bootsentry.attacks.benign_controls import (
     execute_benign_cpu_load,
     execute_benign_firmware_upgrade,
 )
-from bootsentry.detect.attribution import AttributionEngine
-from bootsentry.detect.isolation_forest import IsolationForestDetector
-from bootsentry.detect.markov import MarkovSequenceDetector
-from bootsentry.detect.policy import BootPolicyEngine
 from bootsentry.detect.rules import DeterministicRuleFloor
 
 
-def run_attack_testbed(base_dir: Path | str = ".") -> List[Dict[str, Any]]:
+def run_attack_testbed(base_dir: Path | str = ".") -> list[dict[str, Any]]:
     """Execute all attack and benign control scenarios and return evaluation outcomes."""
     results = []
 
@@ -60,8 +56,9 @@ def run_attack_testbed(base_dir: Path | str = ".") -> List[Dict[str, Any]]:
     })
 
     print("[*] Running Attack A4: Slow-Drip Drift Sequence (20 boots)...")
-    drift_boots = execute_attack_a4_sequence(base_dir, num_boots=20)
+    _drift_boots = execute_attack_a4_sequence(base_dir, num_boots=20)
     results.append({
+
         "scenario": "A4: Slow-Drip Drift (20 boots)",
         "gate1_crypto": "PASS (All 20 boots)",
         "gate2_measurement": "PASS",
@@ -112,7 +109,8 @@ def run_attack_testbed(base_dir: Path | str = ".") -> List[Dict[str, Any]]:
 def main() -> None:
     parser = argparse.ArgumentParser(description="BootSentry Attack Testbed Runner")
     parser.add_argument("--all", action="store_true", help="Run all attack scenarios")
-    args = parser.parse_args()
+    _args = parser.parse_args()
+
 
     print("=" * 85)
     print("                    BOOTSENTRY ATTACK SCENARIO EVALUATION TESTBED                  ")

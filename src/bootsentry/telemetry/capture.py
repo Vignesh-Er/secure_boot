@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 import os
-import sys
 import time
-from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import psutil
 
@@ -16,17 +14,17 @@ from bootsentry.telemetry.record import StageTelemetry
 class ProcessTelemetrySampler:
     """Samples real process performance metrics before and after an execution stage."""
 
-    def __init__(self, pid: Optional[int] = None):
+    def __init__(self, pid: int | None = None):
         self.pid = pid or os.getpid()
         try:
             self.process = psutil.Process(self.pid)
-        except Exception:
+        except (psutil.Error, OSError, AttributeError, ValueError):
             self.process = None
 
         self._t0_ns = 0
-        self._cpu_t0: Optional[Tuple[float, float]] = None
-        self._ctx_t0: Optional[Tuple[int, int]] = None
-        self._io_t0: Optional[Tuple[int, int]] = None
+        self._cpu_t0: tuple[float, float] | None = None
+        self._ctx_t0: tuple[int, int] | None = None
+        self._io_t0: tuple[int, int] | None = None
         self._mem_t0 = 0.0
 
     def start(self) -> None:
@@ -38,32 +36,32 @@ class ProcessTelemetrySampler:
         try:
             cpu_times = self.process.cpu_times()
             self._cpu_t0 = (cpu_times.user, cpu_times.system)
-        except Exception:
+        except (psutil.Error, OSError, AttributeError, ValueError):
             self._cpu_t0 = (0.0, 0.0)
 
         try:
             ctx = self.process.num_ctx_switches()
             self._ctx_t0 = (ctx.voluntary, ctx.involuntary)
-        except Exception:
+        except (psutil.Error, OSError, AttributeError, ValueError):
             self._ctx_t0 = (0, 0)
 
         try:
             io = self.process.io_counters()
             self._io_t0 = (io.read_bytes, io.write_bytes)
-        except Exception:
+        except (psutil.Error, OSError, AttributeError, ValueError):
             self._io_t0 = (0, 0)
 
         try:
             mem = self.process.memory_info()
             self._mem_t0 = mem.rss / (1024.0 * 1024.0)
-        except Exception:
+        except (psutil.Error, OSError, AttributeError, ValueError):
             self._mem_t0 = 0.0
 
     def stop(
         self,
         stage_id: str,
         t_verify_ms: float = 0.0,
-        custom_metrics: Optional[Dict[str, Any]] = None,
+        custom_metrics: dict[str, Any] | None = None,
     ) -> StageTelemetry:
         """Stop recording and calculate delta process telemetry for the stage."""
         elapsed_ms = (time.perf_counter_ns() - self._t0_ns) / 1_000_000.0
@@ -81,7 +79,7 @@ class ProcessTelemetrySampler:
                 if self._cpu_t0:
                     cpu_user_ms = max(0.0, (cpu_t1.user - self._cpu_t0[0]) * 1000.0)
                     cpu_sys_ms = max(0.0, (cpu_t1.system - self._cpu_t0[1]) * 1000.0)
-            except Exception:
+            except (psutil.Error, OSError, AttributeError, ValueError):
                 pass
 
             try:
@@ -89,7 +87,7 @@ class ProcessTelemetrySampler:
                 if self._ctx_t0:
                     ctx_vol = max(0, ctx_t1.voluntary - self._ctx_t0[0])
                     ctx_invol = max(0, ctx_t1.involuntary - self._ctx_t0[1])
-            except Exception:
+            except (psutil.Error, OSError, AttributeError, ValueError):
                 pass
 
             try:
@@ -97,7 +95,7 @@ class ProcessTelemetrySampler:
                 if self._io_t0:
                     io_read = max(0, io_t1.read_bytes - self._io_t0[0])
                     io_write = max(0, io_t1.write_bytes - self._io_t0[1])
-            except Exception:
+            except (psutil.Error, OSError, AttributeError, ValueError):
                 pass
 
             try:
@@ -108,8 +106,9 @@ class ProcessTelemetrySampler:
                     minor_faults = getattr(mem_t1, "num_page_faults", 0)
                 elif hasattr(mem_t1, "major_page_faults"):
                     major_faults = getattr(mem_t1, "major_page_faults", 0)
-            except Exception:
+            except (psutil.Error, OSError, AttributeError, ValueError):
                 pass
+
 
         return StageTelemetry(
             stage_id=stage_id,
