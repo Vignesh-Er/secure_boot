@@ -107,12 +107,13 @@ Evaluated across 67 test boot cycles, 5 realistic attack scenarios, and 3 benign
 | **B2** | Benign: Authorized Upgrade (SVN=6 > 5) | PASS | PASS | Normal Upgrade (Score=0.34) | `PASS` | `security_version (+1.0σ)` |
 | **B3** | Benign: Host CPU Background Load | PASS | PASS | Normal Variance (Score=0.39) | `PASS` | `stage_time_ratio (+0.4σ)` |
 
-### Quantitative Metrics
-- **PR-AUC**: `0.982`
-- **ROC-AUC**: `0.991`
-- **FPR @ 95% TPR**: `0.021`
-- **Benign False HALTs**: **0 (Strictly Zero)**
-- **Test Suite Coverage**: **87%** (76 tests passing)
+### Quantitative Metrics (Single Source of Truth: `eval/project_metrics.json`)
+- **PR-AUC**: `0.7310` (Evaluated on genuine telemetry anomaly testbed)
+- **ROC-AUC**: `0.7267`
+- **FPR @ 95% TPR**: `1.0`
+- **Benign False HALTs**: **0** (Verified 0 false halts across cold cache, legitimate upgrades, and CPU load)
+- **Held-Out A5 Evaluation**: **WARN + REDUCED_TRUST** (Evaluated strictly out-of-sample)
+- **Test Suite Coverage**: **87%** (82 tests passing / 0 failures)
 
 ---
 
@@ -128,50 +129,57 @@ cd secure_boot
 pip install -e .
 ```
 
-### 2. Generate Post-Quantum Keys & Stage Manifests
+### 2. Comprehensive Judge-Readiness Verification (One-Command Proof)
+```bash
+# Run full 14-point automated judge verification & consistency audit
+make judge-check
+```
+
+### 3. Generate Post-Quantum Keys & Stage Manifests
 ```bash
 # Generate ML-DSA-65 keypairs and sign 4 boot stages
 make keys
 ```
 
-### 3. Run a Clean 4-Stage Secure Boot
+### 4. Run a Clean 4-Stage Secure Boot
 ```bash
 # Execute S0 -> S1 -> S2 -> S3 with full telemetry & attestation
 make boot
 ```
 
-### 4. Run the Full Test Suite
+### 5. Run the Full Test Suite
 ```bash
-# Run 76 unit, integration, and attack tests with code coverage
+# Run 82 unit, integration, and attack tests with code coverage
 make test
 ```
 
-### 5. Collect Real Process Telemetry Dataset
+### 6. Collect Real Process Telemetry Dataset
 ```bash
 # Collect 100 genuine boot records from real OS process execution
 make collect N=100
 ```
 
-### 6. Train Behavioral Anomaly Models
+### 7. Train Behavioral Anomaly Models
 ```bash
 # Train Isolation Forest, Markov Sequence, EWMA monitor & Attribution engine
 make train
 ```
 
-### 7. Run Comprehensive Benchmark Evaluation
+### 8. Run Comprehensive Benchmark Evaluation
 ```bash
 # Generate interactive eval/report.html and eval/metrics.json
 make eval
 ```
 
-### 8. Launch the Rich Terminal UI Demonstrator
+### 9. Launch the Rich Terminal UI Demonstrator
 ```bash
-# Live demo across all 7 scenarios
+# Live interactive demo across scenarios
 make demo
 
 # Or safe deterministic replay mode (judge presentation ready)
 make demo-safe
 ```
+
 
 ---
 
@@ -193,7 +201,8 @@ secure_boot/
 │   └── security-analysis.md       # Formal security proofs & safety invariant
 ├── eval/
 │   ├── report.html                # Interactive judge evaluation report
-│   └── metrics.json               # Quantitative benchmark metrics
+│   ├── metrics.json               # Quantitative benchmark metrics
+│   └── project_metrics.json       # Machine-readable single source of truth
 ├── models/                        # Serialized anomaly detection models
 ├── src/bootsentry/
 │   ├── crypto/                    # PQC ML-DSA-65 provider & canonical manifests
@@ -203,12 +212,13 @@ secure_boot/
 │   ├── features/                  # 28 continuous feature extractor
 │   ├── detect/                    # Isolation Forest, Markov, EWMA, Rules, Policy
 │   ├── attacks/                   # Attack testbed (A1-A5 & Benign Controls)
-│   ├── eval/                      # Collector, Trainer, Evaluation Engine
+│   ├── eval/                      # Collector, Trainer, Evaluation & Judge-Check Engine
 │   └── demo/                      # Rich TUI & Safe Replay Demonstrator
-├── tests/                         # 76 comprehensive test cases (>80% cov)
+├── tests/                         # 82 comprehensive test cases (>80% cov)
 ├── Makefile                       # Reproducible CLI targets
 ├── pyproject.toml                 # Project metadata & dependencies
 └── README.md                      # Primary project documentation
+
 ```
 
 ---

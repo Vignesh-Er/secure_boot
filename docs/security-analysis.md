@@ -52,7 +52,8 @@ Hence, the system cannot be bricked by false-positive statistical outliers. $\bl
 
 ## 2. Experimental Verification Summary
 
-- **Total Test Cases**: 76 passing tests (100% pass rate).
+- **Total Test Cases**: 82 passing tests (100% pass rate, mechanically verified via `pytest`).
 - **Code Coverage**: 87% line coverage across all modules.
 - **Benign False HALTs**: 0 (Tested under heavy CPU math load, cold cache, and authorized firmware upgrades).
-- **Held-Out Attack A5**: Successfully detected by Isolation Forest spatial feature analysis (+5.2σ on RSS memory allocation) without hyperparameter retraining.
+- **Held-Out Attack A5**: Successfully detected by Isolation Forest spatial feature analysis without hyperparameter retraining.
+

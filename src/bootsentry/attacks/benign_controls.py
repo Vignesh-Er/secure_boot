@@ -153,3 +153,15 @@ def execute_benign_cpu_load(base_dir: Path | str = ".") -> tuple[BootExecutionRe
             pcr_snapshot=boot_res.pcr_bank.to_dict(),
         )
         return boot_res, record
+
+
+def execute_all_benign_controls(
+    base_dir: Path | str = ".",
+) -> list[tuple[BootExecutionResult, BootRecord]]:
+    """Execute all three benign control scenarios."""
+    return [
+        execute_benign_cold_cache(base_dir),
+        execute_benign_firmware_upgrade(base_dir),
+        execute_benign_cpu_load(base_dir),
+    ]
+
