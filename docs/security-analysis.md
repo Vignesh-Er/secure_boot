@@ -1,4 +1,5 @@
-# BootSentry Formal Security Analysis & Invariant Proofs
+# BootSentry Security Analysis & Safety Invariant Verification
+
 
 ## 1. Mathematical Model of Gates & Policy
 

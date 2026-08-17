@@ -194,11 +194,12 @@ secure_boot/
 ├── data/telemetry/                # Real process boot telemetry JSONL
 ├── docs/
 │   ├── architecture.md            # In-depth architectural design
-│   ├── threat-model.md            # Formal threat model & boundary analysis
+│   ├── threat-model.md            # Threat model & security boundary analysis
 │   ├── leakage-audit.md           # 28-feature data leakage verification
 │   ├── crypto-benchmarks.md       # Measured NIST FIPS 204 benchmarks
 │   ├── limitations.md             # Engineering limitations & trade-offs
-│   └── security-analysis.md       # Formal security proofs & safety invariant
+│   └── security-analysis.md       # Security analysis & safety invariant verification
+
 ├── eval/
 │   ├── report.html                # Interactive judge evaluation report
 │   ├── metrics.json               # Quantitative benchmark metrics

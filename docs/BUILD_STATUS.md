@@ -19,9 +19,24 @@
 
 - [x] **Invariant 1: Deterministic Cryptographic Verification (Gate 1)** — Verified fail-closed on signature mismatches.
 - [x] **Invariant 2: Deterministic Measured Boot (Gate 2)** — Verified SHA-256 PCR state extension and event log replay consistency.
-- [x] **Invariant 3: Non-Bricking AI Policy Floor** — Formally proven and tested: AI anomalies produce `WARN + REDUCED_TRUST`, never an unauthorized `HALT`.
+- [x] **Invariant 3: Non-Bricking AI Policy Floor** — Mechanically tested and verified: AI anomalies produce `WARN + REDUCED_TRUST`, never an unauthorized `HALT`.
 - [x] **Invariant 4: Genuine OS Process Telemetry** — Captured from real execution processes (`psutil`).
 - [x] **Invariant 5: Zero Fake Computation** — Genuine mathematical and hashing workloads without `time.sleep()`.
 - [x] **Invariant 6: Held-Out Attack A5** — Cross-SKU substitution evaluated strictly out-of-sample.
 - [x] **Invariant 7: Feature Schema Versioning** — `FEATURE_VERSION = 1` enforced on all records.
 - [x] **Invariant 8: Zero Network Dependency** — 100% offline, local execution.
+
+---
+
+## Metric Provenance & Verification Traceability
+
+| Metric | Source Code Implementation | Dataset Input | Calculation / Methodology | Output File | README Reference |
+|---|---|---|---|---|---|
+| **PR-AUC (0.7310)** | `src/bootsentry/eval/evaluate.py` | `data/telemetry/normal_boots.jsonl` + Attack boots | `sklearn.metrics.precision_recall_curve` & `auc()` | `eval/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
+| **ROC-AUC (0.7267)** | `src/bootsentry/eval/evaluate.py` | `data/telemetry/normal_boots.jsonl` + Attack boots | `sklearn.metrics.roc_auc_score(y_true, anomaly_scores)` | `eval/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
+| **FPR @ 95% TPR (1.00)** | `src/bootsentry/eval/evaluate.py` | Full test partition with clean vs anomalous boots | Exact false positive rate at threshold achieving $\ge 95\%$ true positive rate | `eval/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
+| **False HALTs (0)** | `src/bootsentry/attacks/benign_controls.py` | Benign variations B1 (Cold cache), B2 (Upgrade), B3 (CPU load) | `execute_all_benign_controls()` policy checks $\forall b \in B: \text{status} \ne \text{HALT}$ | `eval/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
+| **Test Count (82)** | `tests/test_*.py` | Comprehensive test suite (82 test cases) | `pytest tests/` test collector execution | `eval/project_metrics.json` | Header Badge & Quickstart |
+| **Coverage (87%)** | `tests/` across `src/bootsentry/` | Entire codebase line execution tracking | `pytest-cov` statement coverage analysis | `eval/project_metrics.json` | Header Badge & Quickstart |
+| **A5 Held-Out Result** | `src/bootsentry/attacks/cross_sku.py` | Strictly held-out Cross-SKU boots (`NUMA/Edge` mismatch) | Out-of-sample spatial feature evaluation with frozen Isolation Forest model | `eval/metrics.json`, `eval/project_metrics.json` | Attack Matrix & Architecture |
+
