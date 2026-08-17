@@ -186,7 +186,7 @@ def main() -> None:
         print(f"[HALT S2] {res.error_message}", file=sys.stderr)
         sys.exit(1)
     else:
-        print("[✓ S2] Kernel completed successfully.")
+        print("[OK S2] Kernel completed successfully.")
 
 
 if __name__ == "__main__":

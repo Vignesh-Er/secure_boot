@@ -135,7 +135,7 @@ def main() -> None:
         print(f"[HALT S3] {res.error_message}", file=sys.stderr)
         sys.exit(1)
     else:
-        print("[✓ S3] Init and services completed successfully.")
+        print("[OK S3] Init and services completed successfully.")
 
 
 if __name__ == "__main__":

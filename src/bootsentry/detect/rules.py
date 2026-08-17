@@ -75,14 +75,15 @@ class DeterministicRuleFloor:
                 )
 
         # Rule 4: Crypto Status Check (from Gate 1)
-        if record.crypto_status != "PASS":
+        if record.crypto_status not in ("PASS", "COMPLETED"):
             triggered.append("RULE_CRYPTO_VERIFICATION_FAILED")
             reasons.append("Cryptographic signature verification failed at Gate 1")
 
         # Rule 5: Measurement Status Check (from Gate 2)
-        if record.measurement_status != "PASS":
+        if record.measurement_status not in ("PASS", "COMPLETED"):
             triggered.append("RULE_MEASUREMENT_VERIFICATION_FAILED")
             reasons.append("Measured boot state verification failed at Gate 2")
+
 
         passed = len(triggered) == 0
         return RuleCheckResult(

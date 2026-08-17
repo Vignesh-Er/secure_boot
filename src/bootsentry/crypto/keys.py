@@ -128,7 +128,7 @@ def main() -> None:
     kps = generate_all_system_keys(args.out_dir, algorithm=args.algorithm)
     for st, kp in kps.items():
         print(f"  [+] Stage {st:6s}: PK={len(kp.public_key_bytes)} bytes, SK={len(kp.secret_key_bytes)} bytes")
-    print("[✓] All PQC keypairs generated successfully.")
+    print("[OK] All PQC keypairs generated successfully.")
 
 
 if __name__ == "__main__":

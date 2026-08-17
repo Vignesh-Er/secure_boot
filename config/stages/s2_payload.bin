@@ -1,0 +1,2 @@
+# Kernel S2 image payload
+print('S2 Kernel booting...')

@@ -181,7 +181,7 @@ def main() -> None:
         print(f"[HALT S1] {res.error_message}", file=sys.stderr)
         sys.exit(1)
     else:
-        print("[✓ S1] Bootloader completed successfully.")
+        print("[OK S1] Bootloader completed successfully.")
 
 
 if __name__ == "__main__":

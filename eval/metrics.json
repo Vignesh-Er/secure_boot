@@ -1,0 +1,53 @@
+{
+  "roc_auc": 0.7635658914728682,
+  "pr_auc": 0.7582241207925392,
+  "fpr_at_95_tpr": 1.0,
+  "benign_incorrect_halts": 0,
+  "total_test_samples": 67,
+  "decisions": [
+    {
+      "name": "A1: Signed Downgrade",
+      "verdict": "HALT",
+      "rule": [
+        "RULE_SVN_ROLLBACK"
+      ]
+    },
+    {
+      "name": "A2: TOCTOU Config Swap",
+      "verdict": "WARN",
+      "if_score": 0.249053564542,
+      "top_attr": "+322242.8\u03c3"
+    },
+    {
+      "name": "A3: Service Reorder",
+      "verdict": "WARN",
+      "markov_score": 1.0
+    },
+    {
+      "name": "A4: Slow-Drip Drift (20 boots)",
+      "verdict": "WARN + ATTEST",
+      "drift_detected": true
+    },
+    {
+      "name": "A5: Cross-SKU (Held-Out)",
+      "verdict": "WARN",
+      "if_score": 0.5730783123761685,
+      "top_attr": "+128897124.0\u03c3"
+    },
+    {
+      "name": "Benign: Cold Cache",
+      "verdict": "PASS",
+      "risk_score": 0.39555913559138167
+    },
+    {
+      "name": "Benign: Firmware Upgrade",
+      "verdict": "PASS",
+      "risk_score": 0.34006379474166987
+    },
+    {
+      "name": "Benign: Host CPU Load",
+      "verdict": "PASS",
+      "risk_score": 0.392867922690745
+    }
+  ]
+}

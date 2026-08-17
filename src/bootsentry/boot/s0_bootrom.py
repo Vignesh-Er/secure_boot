@@ -189,7 +189,7 @@ def main() -> None:
         print(f"[HALT S0] {res.error_message}", file=sys.stderr)
         sys.exit(1)
     else:
-        print("[✓ S0] BootROM completed successfully.")
+        print("[OK S0] BootROM completed successfully.")
 
 
 if __name__ == "__main__":

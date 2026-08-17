@@ -59,7 +59,7 @@ def main() -> None:
         k_file = keys_dir / f"{stage_id}_private.json"
         if m_file.exists() and k_file.exists():
             sign_stage_manifest_file(m_file, k_file)
-            print(f"[✓] Signed {stage_id.upper()} manifest ({m_file})")
+            print(f"[OK] Signed {stage_id.upper()} manifest ({m_file})")
         else:
             print(f"[-] Skipping {stage_id.upper()} (missing manifest or key)")
 
