@@ -1,0 +1,40 @@
+{
+  "experiment_id": "BOOTSENTRY-FORENSIC-V1",
+  "feature_version": 1,
+  "random_seed": 42,
+  "train_test_split": {
+    "train_fraction": 0.8,
+    "train_samples": 160,
+    "test_samples": 40,
+    "source_file": "data/telemetry/normal_boots.jsonl"
+  },
+  "model_hyperparameters": {
+    "isolation_forest": {
+      "n_estimators": 200,
+      "contamination": "auto",
+      "random_state": 42,
+      "scaler": "StandardScaler (fitted strictly on training split)"
+    },
+    "markov_detector": {
+      "order": 1,
+      "laplace_smoothing": 1.0,
+      "known_services": ["svc_crypto", "svc_storage", "svc_net", "svc_attest", "svc_audit", "svc_diag"]
+    },
+    "ewma_monitor": {
+      "alpha": 0.2,
+      "cusum_threshold": 4.0,
+      "drift_score_mapping": "sigmoid(CUSUM - threshold)"
+    },
+    "deterministic_rule_floor": {
+      "min_trusted_svn": 5,
+      "enforce_pcr_allowlist": true,
+      "enforce_crypto_fail_closed": true
+    }
+  },
+  "held_out_attacks": ["A5: Cross-SKU Substitution"],
+  "evaluation_protocols": {
+    "scenario_level": "Evaluates full attack scenarios (A1, A2, A3, A4 sequence, A5 held-out) against test normal baseline",
+    "sample_level": "Evaluates all discrete boots and sequence executions across time",
+    "benign_control_evaluation": "Independent execution of B1 (Cold Cache), B2 (Firmware Upgrade), B3 (CPU Math Load) to ensure 0 false halts"
+  }
+}

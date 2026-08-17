@@ -1,9 +1,9 @@
 {
-  "roc_auc": 1.0,
-  "pr_auc": 1.0,
-  "fpr_at_95_tpr": 0.0,
+  "roc_auc": 0.7267441860465116,
+  "pr_auc": 0.731040396409253,
+  "fpr_at_95_tpr": 1.0,
   "benign_incorrect_halts": 0,
-  "total_test_samples": 48,
+  "total_test_samples": 67,
   "decisions": [
     {
       "name": "A1: Signed Downgrade",
@@ -15,7 +15,7 @@
     {
       "name": "A2: TOCTOU Config Swap",
       "verdict": "WARN",
-      "if_score": 0.4509080578954693,
+      "if_score": 0.10435201859731655,
       "top_attr": "+322242.8sigma"
     },
     {
@@ -31,7 +31,7 @@
     {
       "name": "A5: Cross-SKU (Held-Out)",
       "verdict": "WARN",
-      "if_score": 0.6273040017863337,
+      "if_score": 0.5784027203335774,
       "top_attr": "+128897124.0sigma"
     },
     {
@@ -49,32 +49,5 @@
       "verdict": "PASS",
       "risk_score": 0.392867922690745
     }
-  ],
-  "sample_level_metrics": {
-    "roc_auc": 0.9583333333333335,
-    "pr_auc": 0.9732587064676617,
-    "fpr_at_95_tpr": 0.0
-  },
-  "ablations": {
-    "isolation_forest_alone": {
-      "roc_auc": 0.9833333333333333,
-      "pr_auc": 0.8666666666666667,
-      "fpr_at_95_tpr": 0.05
-    },
-    "markov_alone": {
-      "roc_auc": 1.0,
-      "pr_auc": 1.0,
-      "fpr_at_95_tpr": 0.0
-    },
-    "ewma_alone": {
-      "drift_detected_boot": 5,
-      "max_drift_score": 1.0,
-      "false_drift_on_normal": 0
-    },
-    "deterministic_rules_alone": {
-      "a1_halt_verified": true,
-      "false_halts_on_normal": 0,
-      "false_halts_on_benign": 0
-    }
-  }
+  ]
 }

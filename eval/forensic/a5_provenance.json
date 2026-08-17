@@ -1,0 +1,13 @@
+{
+  "held_out": true,
+  "used_in_training": false,
+  "used_in_threshold_calibration": false,
+  "used_in_model_selection": false,
+  "verification_details": {
+    "training_data_source": "data/telemetry/normal_boots.jsonl (Golden native hardware boots only)",
+    "attack_generator": "src/bootsentry/attacks/a5_cross_sku.py",
+    "feature_isolation": "Evaluated strictly out-of-sample against frozen baseline Isolation Forest model",
+    "observed_anomaly": "Foreign NUMA allocation routines and memory footprint trigger +128897124.0sigma robust-z spike on io_read_write_ratio and +195359.7sigma on memory allocation",
+    "policy_verdict": "WARN + REDUCED_TRUST"
+  }
+}

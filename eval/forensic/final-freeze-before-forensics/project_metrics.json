@@ -6,13 +6,13 @@
   "test_failures": 0,
   "coverage_percent": 87,
   "ruff_errors": 0,
-  "pr_auc": 1.0,
-  "roc_auc": 1.0,
-  "fpr_at_tpr95": 0.0,
+  "pr_auc": 0.731,
+  "roc_auc": 0.7267,
+  "fpr_at_tpr95": 1.0,
   "benign_false_halts": 0,
   "a5_held_out": true,
   "security_invariants_verified": 8,
-  "git_commit": "9061dcefeffe42d26b6a78930ebfccfe81f5718e",
+  "git_commit": "20e004248cd9e61b2dc9b746c7643e5d063850f7",
   "python_version": "3.12.10",
   "platform": "Windows-11-10.0.26200-SP0"
 }

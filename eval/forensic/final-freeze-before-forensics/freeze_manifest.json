@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-08-17T09:50:00Z",
+  "git_commit": "9061dcefeffe42d26b6a78930ebfccfe81f5718e",
+  "git_tag": "v1.0.0",
+  "python_version": "3.12.10",
+  "os": "Windows AMD64",
+  "dependencies": {
+    "scikit-learn": "1.4.0+",
+    "numpy": "1.26.0+",
+    "rich": "13.7.0+",
+    "psutil": "5.9.0+"
+  },
+  "dataset": {
+    "path": "data/telemetry/normal_boots.jsonl",
+    "total_records": 200,
+    "feature_version": 1
+  },
+  "models": {
+    "isolation_forest": "models/isolation_forest.joblib",
+    "markov_sequence": "models/markov_sequence.joblib",
+    "ewma_monitor": "models/ewma_monitor.joblib",
+    "attribution_engine": "models/attribution_engine.joblib"
+  },
+  "archived_metrics": {
+    "roc_auc": 0.7267441860465116,
+    "pr_auc": 0.731040396409253,
+    "fpr_at_95_tpr": 1.0,
+    "benign_incorrect_halts": 0,
+    "total_test_samples": 67
+  }
+}
