@@ -9,7 +9,9 @@
 | **M5** | Attack Testbed (A1-A5) & Benign Controls (Cold Cache, Load, Upgrade) | **COMPLETED** | 7 / 7 | 86% | `f30232c` |
 | **M6** | Real Dataset Collector, Model Trainer, Evaluation Report (`report.html`) | **COMPLETED** | 3 / 3 | 87% | `b96a90e` |
 | **M7** | Rich Terminal UI (`make demo`) & Safe Replay Engine (`make demo-safe`) | **COMPLETED** | 2 / 2 | 87% | `af9f5bc` |
-| **M8** | Comprehensive Judge Documentation, Full CI Suite & Release Tagging | **COMPLETED** | 76 / 76 | **87%** | `HEAD` |
+| **M8** | Comprehensive Judge Documentation, Full CI Suite & Release Tagging | **COMPLETED** | 82 / 82 | **87%** | `a1d525e` |
+| **AUDIT** | Release Hardening: 0 Ruff Violations, Exception Hardening & Negative Tests | **COMPLETED** | 82 / 82 | **87%** | `HEAD` |
+
 
 ---
 
