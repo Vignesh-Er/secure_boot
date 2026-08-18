@@ -223,6 +223,7 @@ def run_judge_check() -> int:
     console.print("[*] Verifying README quantitative claim synchronization...")
     readme_text = Path("README.md").read_text(encoding="utf-8")
     test_str = f"{test_count} tests"
+    cov_str = f"{cov_pct}%"
     cov_matched = cov_str in readme_text or f"{cov_pct + 1}%" in readme_text or f"{cov_pct - 1}%" in readme_text
     if test_str in readme_text and cov_matched:
         results.append({"check": "README Sync", "detail": f"Exact alignment ({test_str}, {cov_pct}%)", "status": "PASS"})
