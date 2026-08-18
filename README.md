@@ -111,10 +111,10 @@ Evaluated across 67 test boot cycles, 5 realistic attack scenarios, and 3 benign
 | **B3** | Benign: Host CPU Background Load | PASS | PASS | Normal Variance (Score=0.39) | `PASS` | `stage_time_ratio (+0.4σ)` |
 
 ### Quantitative Metrics (Single Source of Truth: `eval/project_metrics.json`)
-- **Multi-Gate System Scenario Mitigation**: **100% Threat Separation** (Scenario-Level Benchmark: `ROC-AUC = 1.0000`, `PR-AUC = 1.0000`, `FPR @ 95% TPR = 0.0000`)
-- **Continuous Behavioral Detector Evaluation**: **Sample-Level ROC-AUC = 0.9370**, **PR-AUC = 0.9459** (Evaluated across all continuous telemetry samples & drift sequences)
+- **Multi-Gate System Threat Mitigation (Scenario-Level)**: **100% Threat Separation** (Scenario-Level Benchmark: `ROC-AUC = 1.0000`, `PR-AUC = 1.0000`, `FPR @ 95% TPR = 0.0000` — Evaluates full multi-gate defense combining deterministic cryptographic rules + behavioral detectors across reference attack fixtures)
+- **Continuous Behavioral ML Detector (Sample-Level Evaluation)**: **Sample-Level ROC-AUC = 0.9563**, **PR-AUC = 0.9699** (Evaluates continuous sample-level behavioral ML performance across sequential executions without deterministic rule floor)
 - **Benign False HALTs**: **0** (Verified 0 false halts across cold cache, legitimate upgrades, and CPU load)
-- **Held-Out A5 Evaluation**: **WARN + REDUCED_TRUST** (Evaluated strictly out-of-sample; top robust-z: `io_read_write_ratio` $+32000.0\sigma$, `io_bytes_read_kb` $+32.0\sigma$, `rss_s2_mb` $+31.3\sigma$)
+- **Held-Out A5 Evaluation**: **WARN + REDUCED_TRUST** (Evaluated strictly out-of-sample; calibrated cross-SKU memory/I/O profile anomaly with top robust-z: `io_read_write_ratio` $+32000.0\sigma$, `io_bytes_read_kb` $+32.0\sigma$, `rss_s2_mb` $+31.3\sigma$)
 - **Test Suite Coverage**: **87%** (116 tests passing / 0 failures)
 - **Forensic Audit Reports**: See [evaluation-forensics.md](docs/evaluation-forensics.md) and [attribution_audit.json](eval/forensic/attribution_audit.json).
 

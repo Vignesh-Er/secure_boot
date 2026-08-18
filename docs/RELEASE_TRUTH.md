@@ -29,8 +29,8 @@
 - **Attack A4 (Slow-Drip Multi-Boot Drift)**: PASS $\to$ EWMA / CUSUM Monitor detects accumulated positive drift at boot 12 ($>4.0\sigma$) $\implies$ `WARN + REDUCED_TRUST`
 - **Attack A5 (Cross-SKU Component Substitution)**: PASS $\to$ Strictly held-out out-of-sample component evaluated with frozen baseline; Isolation Forest flags foreign memory allocation footprint $\implies$ `WARN + REDUCED_TRUST`
 - **Benign Controls (B1 Cold Cache, B2 Upgrade, B3 CPU Load)**: PASS $\to$ 0 false HALTs across all environmental variations
-- **PR-AUC**: 1.0000 (Scenario-level benchmark across A1-A5 threat models) / 0.9459 (Sample-level multi-boot sequence)
-- **ROC-AUC**: 1.0000 (Scenario-level benchmark) / 0.9370 (Sample-level multi-boot sequence)
+- **PR-AUC**: 1.0000 (Scenario-level multi-gate threat mitigation benchmark) / 0.9699 (Continuous sample-level behavioral detector evaluation)
+- **ROC-AUC**: 1.0000 (Scenario-level multi-gate threat mitigation benchmark) / 0.9563 (Continuous sample-level behavioral detector evaluation)
 - **FPR @ 95% TPR**: 0.0000 (Scenario-level benchmark)
 - **False HALTs**: 0
 - **Fresh-Clone Verification**: PASSED (Verified via independent clean clone in isolated temporary directory)
