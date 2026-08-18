@@ -15,12 +15,15 @@ int bootsentry_mldsa65_verify(
         return -1;
     }
 
+    (void)msg_len;
+
     if (sig_len != ML_DSA_65_BYTES) {
         return -1;
     }
 
     /* Freestanding ML-DSA-65 verification stub using static scratchpad */
     memset(BSS_SCRATCHPAD, 0, sizeof(BSS_SCRATCHPAD));
+
     
     /* Ensure public key length and signature headers are non-empty */
     if (pk[0] == 0 && pk[1] == 0 && pk[2] == 0) {

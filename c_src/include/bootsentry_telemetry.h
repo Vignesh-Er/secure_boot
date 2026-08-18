@@ -8,8 +8,9 @@
 extern "C" {
 #endif
 
-#define BOOTSENTRY_FEATURE_VERSION 2
+#define BOOTSENTRY_FEATURE_VERSION 1
 #define BOOTSENTRY_NUM_FEATURES    28
+
 #define BOOTSENTRY_MAX_STAGES      4
 
 typedef enum {
@@ -30,13 +31,14 @@ typedef struct {
     uint32_t ctx_switches_invol;    /* Involuntary context switches (S3 only) */
     uint32_t io_bytes_read_kb;      /* Storage I/O read bytes (S2/S3 only) */
     uint32_t io_bytes_written_kb;   /* Storage I/O write bytes (S2/S3 only) */
-} __attribute__((packed)) StageRawTelemetry;
+} StageRawTelemetry;
 
 typedef struct {
     uint32_t feature_version;
     uint32_t boot_id_hash;
     float features[BOOTSENTRY_NUM_FEATURES];
-} __attribute__((packed)) BootFeatureVector;
+} BootFeatureVector;
+
 
 typedef enum {
     POLICY_VERDICT_PASS = 0,

@@ -106,15 +106,17 @@ class TestEWMADriftMonitor:
         monitor.fit(normal_training_records)
 
         # Send 10 normal boots
+        rng = np.random.default_rng(42)
         for i in range(10):
             rec = BootRecord(
                 boot_id=f"seq-norm-{i}",
                 timestamp_iso="2026-08-17T08:00:00Z",
-                total_boot_time_ms=50.0 + np.random.normal(0, 1.0),
+                total_boot_time_ms=50.0 + rng.normal(0, 1.0),
             )
             is_drift, score, _ = monitor.update(rec, current_if_score=0.1)
             assert not is_drift
             assert score < 0.5
+
 
         # Send 15 progressively slower boots (Attack A4 slow-drip)
         drift_detected = False

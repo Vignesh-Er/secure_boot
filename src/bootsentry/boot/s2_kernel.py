@@ -13,6 +13,7 @@ from pathlib import Path
 from bootsentry.boot.handoff import BootHandoff
 from bootsentry.crypto.keys import load_public_key
 from bootsentry.crypto.manifest import Manifest
+from bootsentry.crypto.provider import CryptoError, MalformedKeyError
 from bootsentry.crypto.verify import verify_manifest
 
 
@@ -90,7 +91,17 @@ def run_stage_2(
     payload_bytes = s3_payload_file.read_bytes() if s3_payload_file.exists() else b""
 
     # Step 3: Cryptographic verification of S3 Init (Gate 1)
-    _, _, s2_pub_key = load_public_key(s2_pub_key_file)
+    try:
+        _, _, s2_pub_key = load_public_key(s2_pub_key_file)
+    except (CryptoError, MalformedKeyError, OSError, ValueError, KeyError) as e:
+        handoff.current_stage = "S2"
+        handoff.next_stage = "S3"
+        handoff.status = "HALTED"
+        handoff.error_message = f"Gate 1 Cryptographic failure in S2 loading public key: {e}"
+        handoff.stage_metrics["crypto_success_s2"] = False
+        handoff.save(run_path / "handoff_s2.json")
+        return handoff
+
     verify_res = verify_manifest(
         manifest=manifest,
         public_key_bytes=s2_pub_key,

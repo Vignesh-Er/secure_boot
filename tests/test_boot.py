@@ -129,3 +129,74 @@ class TestBootChainExecution:
 
         assert res.status == "HALTED"
         assert "Unknown service requested" in res.error_message
+
+    def test_boot_with_model_manifest_measured_into_pcr3(self, boot_env, monkeypatch):
+        tmp_path, keys_dir, stages_dir = boot_env
+        run_dir = tmp_path / "run"
+
+        # Create mock models directory with signed model manifest
+        models_dir = tmp_path / "models"
+        models_dir.mkdir(parents=True, exist_ok=True)
+        (models_dir / "isolation_forest.joblib").write_bytes(b"IF_MODEL_WEIGHTS")
+        (models_dir / "markov_sequence.joblib").write_bytes(b"MARKOV_WEIGHTS")
+        (models_dir / "ewma_monitor.joblib").write_bytes(b"EWMA_WEIGHTS")
+        (models_dir / "attribution_engine.joblib").write_bytes(b"ATTR_WEIGHTS")
+
+        from bootsentry.crypto.keys import load_public_key, load_secret_key
+        from bootsentry.crypto.model_manifest import create_model_manifest, sign_model_manifest
+
+        _, _, sk = load_secret_key(keys_dir / "s3_private.json")
+        _, _, pk = load_public_key(keys_dir / "s3_public.json")
+        manifest = create_model_manifest(
+            models_dir=models_dir, signer_public_key_bytes=pk, model_version=2
+        )
+        signed_manifest = sign_model_manifest(manifest, signer_secret_key_bytes=sk)
+        signed_manifest.save(models_dir / "model_manifest.json")
+
+        monkeypatch.chdir(tmp_path)
+        res = execute_boot_chain(
+            keys_dir=keys_dir,
+            stages_dir=stages_dir,
+            run_dir=run_dir,
+        )
+
+        assert res.status == "COMPLETED"
+        # Verify PCR[3] extension and event log
+        event_types = [e.event_type for e in res.event_log.entries]
+        assert "MODEL_MANIFEST_MEASURE" in event_types
+
+    def test_boot_halt_on_tampered_model_manifest(self, boot_env, monkeypatch):
+        tmp_path, keys_dir, stages_dir = boot_env
+        run_dir = tmp_path / "run"
+
+        models_dir = tmp_path / "models"
+        models_dir.mkdir(parents=True, exist_ok=True)
+        (models_dir / "isolation_forest.joblib").write_bytes(b"IF_MODEL_WEIGHTS")
+        (models_dir / "markov_sequence.joblib").write_bytes(b"MARKOV_WEIGHTS")
+        (models_dir / "ewma_monitor.joblib").write_bytes(b"EWMA_WEIGHTS")
+        (models_dir / "attribution_engine.joblib").write_bytes(b"ATTR_WEIGHTS")
+
+        from bootsentry.crypto.keys import load_public_key, load_secret_key
+        from bootsentry.crypto.model_manifest import create_model_manifest, sign_model_manifest
+
+        _, _, sk = load_secret_key(keys_dir / "s3_private.json")
+        _, _, pk = load_public_key(keys_dir / "s3_public.json")
+        manifest = create_model_manifest(
+            models_dir=models_dir, signer_public_key_bytes=pk, model_version=2
+        )
+        signed_manifest = sign_model_manifest(manifest, signer_secret_key_bytes=sk)
+        # Tamper with model weight on disk after signing
+        (models_dir / "isolation_forest.joblib").write_bytes(b"TAMPERED_MODEL_WEIGHTS")
+        signed_manifest.save(models_dir / "model_manifest.json")
+
+        monkeypatch.chdir(tmp_path)
+        res = execute_boot_chain(
+            keys_dir=keys_dir,
+            stages_dir=stages_dir,
+            run_dir=run_dir,
+        )
+
+        assert res.status == "HALTED"
+        assert "Gate 3 Model Manifest Verification Failed" in res.error_message
+
+

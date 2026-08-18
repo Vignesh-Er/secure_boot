@@ -13,6 +13,7 @@ from pathlib import Path
 from bootsentry.boot.handoff import BootHandoff
 from bootsentry.crypto.keys import load_public_key
 from bootsentry.crypto.manifest import Manifest
+from bootsentry.crypto.provider import CryptoError, MalformedKeyError
 from bootsentry.crypto.verify import verify_manifest
 from bootsentry.measure.eventlog import EventLog
 from bootsentry.measure.pcr import PcrBank
@@ -79,7 +80,22 @@ def run_stage_0(
     payload_bytes = s1_payload_file.read_bytes() if s1_payload_file.exists() else b""
 
     # Step 3: Cryptographic verification of S1 (Gate 1)
-    _, _, s0_pub_key = load_public_key(s0_pub_key_file)
+    try:
+        _, _, s0_pub_key = load_public_key(s0_pub_key_file)
+    except (CryptoError, MalformedKeyError, OSError, ValueError, KeyError) as e:
+        handoff = BootHandoff(
+            boot_id=bid,
+            current_stage="S0",
+            next_stage="S1",
+            pcr_state=pcr_bank.to_dict(),
+            event_log_data=event_log.to_list(),
+            status="HALTED",
+            error_message=f"Gate 1 Cryptographic failure in S0 loading public key: {e}",
+            stage_metrics={"crypto_success": False},
+        )
+        handoff.save(run_path / "handoff_s0.json")
+        return handoff
+
     verify_res = verify_manifest(
         manifest=manifest,
         public_key_bytes=s0_pub_key,

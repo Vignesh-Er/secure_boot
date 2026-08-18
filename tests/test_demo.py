@@ -1,7 +1,7 @@
 """Unit tests for Rich Terminal UI and Safe Replay Mode."""
 
 from bootsentry.demo.safe_replay import SAFE_DEMO_SCENARIOS
-from bootsentry.demo.tui import render_bootsentry_dashboard
+from bootsentry.demo.tui import render_bootsentry_dashboard, run_interactive_demo
 
 
 class TestDemoTUI:
@@ -28,8 +28,17 @@ class TestDemoTUI:
             assert "verdict" in data
             assert "attributions" in data
 
-    def test_render_all_scenarios(self):
+    def test_render_all_scenarios(self, capsys):
         for _s, data in SAFE_DEMO_SCENARIOS.items():
-            # Verify rendering function runs without exceptions
             render_bootsentry_dashboard(data)
+            captured = capsys.readouterr()
+            # Assert that dashboard sections and verdict badge were rendered
+            assert "VERDICT:" in captured.out or "VERDICT" in captured.out
+            assert "TPM PCR Bank Snapshot" in captured.out
+            assert "Three Security Gates" in captured.out
 
+    def test_run_interactive_demo_safe(self, capsys):
+        run_interactive_demo(safe_replay=True)
+        captured = capsys.readouterr()
+        assert "BOOTSENTRY: AI-ASSISTED SECURE BOOT LIVE DEMONSTRATOR" in captured.out
+        assert "SAFE REPLAY MODE" in captured.out

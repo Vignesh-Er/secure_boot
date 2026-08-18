@@ -32,6 +32,12 @@ venv/
 env/
 .env
 
+# C build artifacts
+*.o
+*.obj
+*.exe
+*.out
+
 # Testing & Coverage
 .coverage
 .coverage.*
