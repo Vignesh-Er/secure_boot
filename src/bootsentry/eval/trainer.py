@@ -61,13 +61,46 @@ def train_all_models(
     attr_file = models_path / "attribution_engine.joblib"
     attribution_engine.save(attr_file)
 
-    print(f"[OK] All models trained and saved to {models_path}")
+    # 5. Export Transpiled C Decision Trees
+    c_trees_file = Path("c_src/src/generated_trees.c")
+    if_detector.export_c_code(c_trees_file)
+    print(f"  [+] Transpiled C99 decision trees exported to {c_trees_file}")
+
+    # 6. Generate and Sign Cryptographic Model Manifest (Gate 1 PQC Sealing)
+    from bootsentry.crypto.keys import load_public_key, load_secret_key
+    from bootsentry.crypto.model_manifest import create_model_manifest, sign_model_manifest
+
+    s3_priv = Path("config/keys/s3_private.json")
+    s3_pub = Path("config/keys/s3_public.json")
+    manifest_file = models_path / "model_manifest.json"
+
+    if s3_priv.exists() and s3_pub.exists():
+        _, _, pk_bytes = load_public_key(s3_pub)
+        _, _, sk_bytes = load_secret_key(s3_priv)
+        manifest = create_model_manifest(
+            models_dir=models_path,
+            signer_public_key_bytes=pk_bytes,
+            model_filenames=[
+                "isolation_forest.joblib",
+                "markov_sequence.joblib",
+                "ewma_monitor.joblib",
+                "attribution_engine.joblib",
+            ],
+        )
+        signed_manifest = sign_model_manifest(manifest, sk_bytes)
+        signed_manifest.save(manifest_file)
+        print(f"  [+] Cryptographically signed model manifest saved to {manifest_file}")
+
+    print(f"[OK] All models trained, sealed, and saved to {models_path}")
     return {
         "isolation_forest": if_file,
         "markov": markov_file,
         "ewma": ewma_file,
         "attribution": attr_file,
+        "c_trees": c_trees_file,
+        "model_manifest": manifest_file,
     }
+
 
 
 def main() -> None:

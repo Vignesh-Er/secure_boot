@@ -3,8 +3,9 @@
 [![CI](https://github.com/Vignesh-Er/secure_boot/actions/workflows/ci.yml/badge.svg)](https://github.com/Vignesh-Er/secure_boot/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Coverage: 87%](https://img.shields.io/badge/coverage-87%25-brightgreen.svg)](eval/report.html)
+[![Coverage: 84%](https://img.shields.io/badge/coverage-84%25-brightgreen.svg)](eval/report.html)
 [![PQC: ML--DSA--65](https://img.shields.io/badge/PQC-NIST_FIPS_204_(ML--DSA--65)-purple.svg)](docs/crypto-benchmarks.md)
+
 
 > **Traditional secure boot answers:** *"Is this component authentic and approved?"*  
 > **BootSentry additionally asks:** *"Is this boot behavior normal for this device and boot history?"*
@@ -112,7 +113,7 @@ Evaluated across 67 test boot cycles, 5 realistic attack scenarios, and 3 benign
 - **Continuous Behavioral Detector Evaluation**: **Sample-Level ROC-AUC = 0.9370**, **PR-AUC = 0.9459** (Evaluated across all continuous telemetry samples & drift sequences)
 - **Benign False HALTs**: **0** (Verified 0 false halts across cold cache, legitimate upgrades, and CPU load)
 - **Held-Out A5 Evaluation**: **WARN + REDUCED_TRUST** (Evaluated strictly out-of-sample; top robust-z: `io_read_write_ratio` $+32000.0\sigma$, `io_bytes_read_kb` $+32.0\sigma$, `rss_s2_mb` $+31.3\sigma$)
-- **Test Suite Coverage**: **87%** (83 tests passing / 0 failures)
+- **Test Suite Coverage**: **84%** (86 tests passing / 0 failures)
 - **Forensic Audit Reports**: See [evaluation-forensics.md](docs/evaluation-forensics.md) and [attribution_audit.json](eval/forensic/attribution_audit.json).
 
 
@@ -150,12 +151,13 @@ make boot
 
 ### 5. Run the Full Test Suite
 ```bash
-# Run 83 unit, integration, and attack tests with code coverage
+# Run 86 unit, integration, and attack tests with code coverage
 make test
 ```
 
 
 ### 6. Collect Real Process Telemetry Dataset
+
 ```bash
 # Collect 100 genuine boot records from real OS process execution
 make collect N=100

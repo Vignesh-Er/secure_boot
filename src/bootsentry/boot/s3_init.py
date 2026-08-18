@@ -10,6 +10,7 @@ from pathlib import Path
 from bootsentry.boot.handoff import BootHandoff
 from bootsentry.boot.services import DEFAULT_SERVICE_SEQUENCE, SERVICE_REGISTRY
 from bootsentry.crypto.keys import load_secret_key
+from bootsentry.crypto.provider import CryptoError, VerificationError
 from bootsentry.measure.quote import generate_attestation_quote
 
 
@@ -75,10 +76,45 @@ def run_stage_3(
             "latency_ms": t_svc_ms,
         }
 
-    # Step 2: Generate Signed Attestation Quote
+    # Step 2: Measure & Cryptographically Verify Gate 3 Anomaly Models into PCR[3]
+    models_dir = Path("models")
+    model_manifest_file = models_dir / "model_manifest.json"
+    if model_manifest_file.exists():
+        try:
+            from bootsentry.crypto.model_manifest import ModelManifest, verify_model_manifest
+
+            m_manifest = ModelManifest.load(model_manifest_file)
+            # Verify internal signature and file digests on disk
+            verify_model_manifest(m_manifest, models_dir=models_dir)
+
+
+            # Extend PCR[3] with model composite digest
+            pcr_bank.extend(3, m_manifest.composite_model_digest)
+            event_log.record_event(
+                stage_id="S3",
+                event_type="MODEL_MANIFEST_MEASURE",
+                pcr_index=3,
+                digest=m_manifest.composite_model_digest,
+                version="2.0.0",
+                event_data={
+                    "model_version": m_manifest.model_version,
+                    "files": list(m_manifest.model_files.keys()),
+                },
+            )
+        except (CryptoError, VerificationError, OSError, ValueError, KeyError) as e:
+            handoff.current_stage = "S3"
+            handoff.next_stage = "DONE"
+            handoff.status = "HALTED"
+            handoff.error_message = f"Gate 3 Model Manifest Verification Failed: {e}"
+            handoff.save(run_path / "handoff_s3.json")
+            return handoff
+
+
+    # Step 3: Generate Signed Attestation Quote
     attest_key_file = keys_path / "attest_private.json"
     if attest_key_file.exists():
         _, alg, sk_bytes = load_secret_key(attest_key_file)
+
         quote = generate_attestation_quote(
             pcr_bank=pcr_bank,
             event_log=event_log,

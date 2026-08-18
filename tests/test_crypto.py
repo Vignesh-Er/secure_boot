@@ -376,3 +376,98 @@ class TestManifestFileOperationsAndCLI:
         with pytest.raises(MalformedKeyError):
             load_secret_key(bad_priv)
 
+
+class TestModelManifest:
+    def test_model_manifest_create_sign_verify_happy_path(self, tmp_path):
+        from bootsentry.crypto.model_manifest import (
+            ModelManifest,
+            create_model_manifest,
+            sign_model_manifest,
+            verify_model_manifest,
+        )
+
+        # 1. Create dummy model files
+        models_dir = tmp_path / "models"
+        models_dir.mkdir()
+        (models_dir / "m1.joblib").write_bytes(b"MODEL_DATA_1_WEIGHTS")
+        (models_dir / "m2.joblib").write_bytes(b"MODEL_DATA_2_TREES")
+
+        # 2. Keygen
+        kp = generate_stage_keypair("S3", algorithm="ML-DSA-65")
+
+        # 3. Create & Sign
+        manifest = create_model_manifest(
+            models_dir=models_dir,
+            signer_public_key_bytes=kp.public_key_bytes,
+            model_filenames=["m1.joblib", "m2.joblib"],
+        )
+        signed = sign_model_manifest(manifest, kp.secret_key_bytes)
+        manifest_file = models_dir / "model_manifest.json"
+        signed.save(manifest_file)
+
+        # 4. Verify loaded
+        loaded = ModelManifest.load(manifest_file)
+        assert verify_model_manifest(loaded, models_dir=models_dir, expected_public_key_bytes=kp.public_key_bytes) is True
+
+    def test_model_manifest_tampered_model_file_fails(self, tmp_path):
+        from bootsentry.crypto.model_manifest import (
+            create_model_manifest,
+            sign_model_manifest,
+            verify_model_manifest,
+        )
+        from bootsentry.crypto.provider import VerificationError
+
+        models_dir = tmp_path / "models"
+        models_dir.mkdir()
+        (models_dir / "m1.joblib").write_bytes(b"CLEAN_MODEL_DATA")
+
+        kp = generate_stage_keypair("S3", algorithm="ML-DSA-65")
+        manifest = create_model_manifest(
+            models_dir=models_dir,
+            signer_public_key_bytes=kp.public_key_bytes,
+            model_filenames=["m1.joblib"],
+        )
+        signed = sign_model_manifest(manifest, kp.secret_key_bytes)
+
+        # Tamper with model file on disk
+        (models_dir / "m1.joblib").write_bytes(b"TAMPERED_ADVERSARIAL_WEIGHTS")
+
+        with pytest.raises(VerificationError, match="Model file digest mismatch"):
+            verify_model_manifest(signed, models_dir=models_dir)
+
+    def test_model_manifest_corrupted_signature_fails(self, tmp_path):
+        from bootsentry.crypto.model_manifest import (
+            ModelManifest,
+            create_model_manifest,
+            sign_model_manifest,
+            verify_model_manifest,
+        )
+        from bootsentry.crypto.provider import VerificationError
+
+        models_dir = tmp_path / "models"
+        models_dir.mkdir()
+        (models_dir / "m1.joblib").write_bytes(b"CLEAN_MODEL_DATA")
+
+        kp = generate_stage_keypair("S3", algorithm="ML-DSA-65")
+        manifest = create_model_manifest(
+            models_dir=models_dir,
+            signer_public_key_bytes=kp.public_key_bytes,
+            model_filenames=["m1.joblib"],
+        )
+        signed = sign_model_manifest(manifest, kp.secret_key_bytes)
+
+        # Corrupt signature hex
+        corrupted_sig = "ff" * (len(signed.signature_hex) // 2)
+        corrupted_manifest = ModelManifest(
+            model_version=signed.model_version,
+            algorithm=signed.algorithm,
+            model_files=signed.model_files,
+            composite_model_digest=signed.composite_model_digest,
+            signer_public_key_hex=signed.signer_public_key_hex,
+            signature_hex=corrupted_sig,
+        )
+
+        with pytest.raises(VerificationError, match="signature verification failed"):
+            verify_model_manifest(corrupted_manifest, models_dir=models_dir)
+
+

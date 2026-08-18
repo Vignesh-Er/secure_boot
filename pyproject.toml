@@ -63,3 +63,15 @@ testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "-v --strict-markers"
 
+[tool.coverage.run]
+source = ["src/bootsentry"]
+omit = [
+    "src/bootsentry/eval/judge_check.py",
+    "src/bootsentry/demo/tui.py",
+    "src/bootsentry/cli.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+
+

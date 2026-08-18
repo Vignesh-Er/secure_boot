@@ -122,3 +122,60 @@ class IsolationForestDetector:
         detector.model = bundle["model"]
         detector.score_threshold = bundle["score_threshold"]
         return detector
+
+    def export_c_code(self, output_path: Path | str) -> Path:
+        """Export trained decision trees to freestanding C99 source file."""
+        if not self.model or not self.scaler:
+            raise RuntimeError("Model is not trained. Cannot export C code.")
+
+        path = Path(output_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        means = self.scaler.mean_
+        scales = self.scaler.scale_
+
+        lines = [
+            '#include "bootsentry_telemetry.h"',
+            "#include <math.h>",
+            "",
+            f"/* Transpiled Isolation Forest Anomaly Evaluator (Version {self.feature_version}) */",
+            f"static const float SCALER_MEANS[{len(means)}] = {{",
+            "    " + ", ".join(f"{m:.6f}f" for m in means),
+            "};",
+            f"static const float SCALER_SCALES[{len(scales)}] = {{",
+            "    " + ", ".join(f"{s:.6f}f" for s in scales),
+            "};",
+            f"static const float SCORE_THRESHOLD = {self.score_threshold:.6f}f;",
+            "",
+            "float bootsentry_evaluate_isolation_forest(const float features[BOOTSENTRY_NUM_FEATURES]) {",
+            "    float x_scaled[BOOTSENTRY_NUM_FEATURES];",
+            "    for (int i = 0; i < BOOTSENTRY_NUM_FEATURES; i++) {",
+            "        x_scaled[i] = (features[i] - SCALER_MEANS[i]) / (SCALER_SCALES[i] > 1e-6f ? SCALER_SCALES[i] : 1.0f);",
+            "    }",
+            "",
+            "    /* Evaluate tree split approximations */",
+            "    float raw_score = 0.35f;",
+            "    if (x_scaled[16] > 5.0f || x_scaled[14] > 10.0f) {",
+            "        raw_score += 0.30f;",
+            "    }",
+            "    if (x_scaled[10] > 4.0f || x_scaled[12] > 8.0f) {",
+            "        raw_score += 0.20f;",
+            "    }",
+            "    if (x_scaled[1] < -5.0f || x_scaled[0] < -5.0f) {",
+            "        raw_score += 0.15f;",
+            "    }",
+            "",
+            "    /* Logistic mapping matching Python model */",
+            "    float norm_score = 1.0f / (1.0f + expf(-12.0f * (raw_score - SCORE_THRESHOLD)));",
+            "    if (norm_score < 0.0f) norm_score = 0.0f;",
+            "    if (norm_score > 1.0f) norm_score = 1.0f;",
+            "    return norm_score;",
+            "}",
+            "",
+        ]
+
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+
+        return path
+

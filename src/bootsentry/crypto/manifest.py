@@ -9,6 +9,17 @@ from pathlib import Path
 from typing import Any
 
 
+def canonicalize_json(data: dict[str, Any]) -> bytes:
+    """Deterministic RFC 8785 JSON canonical representation for hashing/signing."""
+    canonical_str = json.dumps(
+        data,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    )
+    return canonical_str.encode("utf-8")
+
+
 @dataclass
 class Manifest:
     stage_id: str
@@ -29,13 +40,8 @@ class Manifest:
 
     def canonical_bytes(self) -> bytes:
         """Deterministic RFC 8785 JSON canonical representation for hashing/signing."""
-        canonical_str = json.dumps(
-            self.canonical_dict(),
-            sort_keys=True,
-            separators=(",", ":"),
-            ensure_ascii=False,
-        )
-        return canonical_str.encode("utf-8")
+        return canonicalize_json(self.canonical_dict())
+
 
     def canonical_digest(self) -> str:
         """SHA-256 hex digest of the canonical manifest bytes."""
