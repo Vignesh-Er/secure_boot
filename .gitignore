@@ -54,12 +54,8 @@ coverage.xml
 .DS_Store
 Thumbs.db
 
-# Large Telemetry & Model Binaries (except small sample data)
-data/telemetry/*.jsonl
+# Telemetry & Model Binaries (track core baseline & models)
 data/raw/
-models/*.joblib
-!models/.gitkeep
-eval/*.png
-eval/report.html
 run/
+eval/*.png
 
