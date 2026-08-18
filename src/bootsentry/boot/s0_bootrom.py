@@ -173,10 +173,15 @@ def run_stage_0(
             "--run-dir",
             str(run_path),
         ]
-        proc = subprocess.run(cmd, capture_output=True, text=True)
-        if proc.returncode != 0:
+        try:
+            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            if proc.returncode != 0:
+                handoff.status = "HALTED"
+                handoff.error_message = f"S1 process exited with code {proc.returncode}: {proc.stderr}"
+                handoff.save(handoff_file)
+        except subprocess.TimeoutExpired:
             handoff.status = "HALTED"
-            handoff.error_message = f"S1 process exited with code {proc.returncode}: {proc.stderr}"
+            handoff.error_message = "S1 process timed out after 30s"
             handoff.save(handoff_file)
 
     return handoff

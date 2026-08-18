@@ -18,14 +18,16 @@ from bootsentry.telemetry.record import FEATURE_VERSION, BootRecord
 
 
 class IsolationForestDetector:
-    """Isolation Forest anomaly detector with StandardScaler preprocessing."""
+    """Layer A behavioral anomaly detector using 28 continuous features."""
+
+    LOGISTIC_STEEPNESS: float = 12.0
 
     def __init__(
         self,
         n_estimators: int = 200,
         contamination: str | float = "auto",
         random_state: int = 42,
-    ):
+    ) -> None:
         self.n_estimators = n_estimators
         self.contamination = contamination
         self.random_state = random_state
@@ -58,7 +60,7 @@ class IsolationForestDetector:
         return self
 
     def score_record(self, record: BootRecord) -> float:
-        """Calculate normalized anomaly score in [0, 1] for a single BootRecord."""
+        """Score record in [0, 1]. Higher indicates abnormal behavior."""
         if not self.model or not self.scaler:
             raise RuntimeError("Model is not trained. Call fit() or load() first.")
 
@@ -76,7 +78,7 @@ class IsolationForestDetector:
         # Normalize score into roughly [0, 1] with sigmoid/threshold mapping
         # raw_score typically ranges from ~0.35 (very normal) to ~0.75 (highly anomalous)
         # Using centered logistic mapping:
-        norm_score = 1.0 / (1.0 + np.exp(-12.0 * (raw_score - self.score_threshold)))
+        norm_score = 1.0 / (1.0 + np.exp(-self.LOGISTIC_STEEPNESS * (raw_score - self.score_threshold)))
         return float(np.clip(norm_score, 0.0, 1.0))
 
     def predict(self, record: BootRecord) -> tuple[bool, float]:

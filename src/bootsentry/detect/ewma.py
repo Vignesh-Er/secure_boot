@@ -18,6 +18,10 @@ class EWMADriftMonitor:
     statistics over boot durations, anomaly scores, and context switches.
     """
 
+    CUSUM_SIGMOID_SCALE: float = 3.0
+    SUSTAINED_DRIFT_THRESHOLD: float = 0.3
+    SUSTAINED_DRIFT_WEIGHT: float = 0.8
+
     def __init__(
         self,
         alpha: float = 0.2,
@@ -93,13 +97,16 @@ class EWMADriftMonitor:
         # Calculate drift score in [0, 1]
         # Drift score activates when CUSUM or EWMA exceeds threshold
         cusum_ratio = self.cusum_pos / (self.cusum_h + 1e-6)
-        drift_score = 1.0 / (1.0 + math.exp(-3.0 * (cusum_ratio - 1.0)))
+        drift_score = 1.0 / (1.0 + math.exp(-self.CUSUM_SIGMOID_SCALE * (cusum_ratio - 1.0)))
 
         # Also factor in sustained multi-boot IF score elevations
         if len(self.history_scores) >= 5:
             recent_mean = float(np.mean(self.history_scores[-5:]))
-            if recent_mean > 0.3:
-                drift_score = min(1.0, drift_score + (recent_mean - 0.3) * 0.8)
+            if recent_mean > self.SUSTAINED_DRIFT_THRESHOLD:
+                drift_score = min(
+                    1.0,
+                    drift_score + (recent_mean - self.SUSTAINED_DRIFT_THRESHOLD) * self.SUSTAINED_DRIFT_WEIGHT,
+                )
 
         drift_score = float(np.clip(drift_score, 0.0, 1.0))
         is_drift = drift_score >= 0.5

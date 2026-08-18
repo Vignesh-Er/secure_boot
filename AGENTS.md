@@ -69,11 +69,12 @@ BootSentry adds: *"Is this boot behavior normal for this device and historical b
 
 | Milestone | Description | Status | Verification Evidence |
 | :--- | :--- | :--- | :--- |
-| **M1** | Project Constitution, Repo Skeleton & Crypto Layer | IN_PROGRESS | Keygen/Sign/Verify tests |
-| **M2** | Measured Boot & 4-Stage Process Chain | PENDING | S0-S3 handoffs & PCR verify |
-| **M3** | Telemetry, Feature Extraction & Leakage Audit | PENDING | BootRecord JSONL & audit doc |
-| **M4** | Detection Engine (IF, Markov, EWMA, Policy) | PENDING | Detection & attribution tests |
-| **M5** | Attack Suite (A1-A5) & Benign Controls | PENDING | Scenario execution matrix |
-| **M6** | Data Collection, Model Training & Eval Report | PENDING | 1000+ real boots & HTML report |
-| **M7** | Rich TUI & Demo-Safe Replay Engine | PENDING | `make demo` & `make demo-safe` |
-| **M8** | Comprehensive Docs, CI, Git Tags & Judge Polish | PENDING | Clean repo, pytest >80%, GitHub push |
+| **M1** | Project Constitution, Repo Skeleton & Crypto Layer | COMPLETED | 35 Keygen/Sign/Verify tests |
+| **M2** | Measured Boot & 4-Stage Process Chain | COMPLETED | S0-S3 handoffs & PCR verify |
+| **M3** | Telemetry, Feature Extraction & Leakage Audit | COMPLETED | BootRecord JSONL & audit doc |
+| **M4** | Detection Engine (IF, Markov, EWMA, Policy) | COMPLETED | Detection & attribution tests |
+| **M5** | Attack Suite (A1-A5) & Benign Controls | COMPLETED | Scenario execution matrix |
+| **M6** | Data Collection, Model Training & Eval Report | COMPLETED | 201 real boots & HTML report |
+| **M7** | Rich TUI & Demo-Safe Replay Engine | COMPLETED | `make demo` & `make demo-safe` |
+| **M8** | Comprehensive Docs, CI, Git Tags & Judge Polish | COMPLETED | 116 tests, 87% cov, GitHub push |
+

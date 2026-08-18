@@ -286,14 +286,13 @@ def generate_html_report(metrics: dict[str, Any], out_file: Path) -> None:
         <div class="subtitle">AI-Assisted Secure Boot & Integrity Verification -- Post-Quantum ML-DSA-65 & Multi-Gate Telemetry</div>
 
         <div class="grid">
-
             <div class="card">
                 <div class="metric-val">{pr_auc:.3f}</div>
-                <div class="metric-label">PR-AUC</div>
+                <div class="metric-label">Scenario PR-AUC</div>
             </div>
             <div class="card">
                 <div class="metric-val">{roc_auc:.3f}</div>
-                <div class="metric-label">ROC-AUC</div>
+                <div class="metric-label">Scenario ROC-AUC</div>
             </div>
             <div class="card">
                 <div class="metric-val">{fpr_95:.3f}</div>

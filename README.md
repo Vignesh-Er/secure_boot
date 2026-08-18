@@ -3,7 +3,7 @@
 [![CI](https://github.com/Vignesh-Er/secure_boot/actions/workflows/ci.yml/badge.svg)](https://github.com/Vignesh-Er/secure_boot/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Coverage: 84%](https://img.shields.io/badge/coverage-84%25-brightgreen.svg)](eval/report.html)
+[![Coverage: 87%](https://img.shields.io/badge/coverage-87%25-brightgreen.svg)](eval/report.html)
 [![PQC: ML--DSA--65](https://img.shields.io/badge/PQC-NIST_FIPS_204_(ML--DSA--65)-purple.svg)](docs/crypto-benchmarks.md)
 
 
@@ -40,6 +40,8 @@ Standard cryptographic secure boot systems (such as UEFI Secure Boot) verify sta
 | **4** | **Genuine Process Telemetry Only** | OS process telemetry captured via `psutil` sampling (no synthetic datasets) | Ground-truth reproducibility |
 | **5** | **Zero Fake Computation** | Cryptographic hashing, memory table generation, and math workloads (no `time.sleep()`) | Real CPU/Memory/IO profiles |
 | **6** | **Strictly Held-Out Attack A5** | Cross-SKU substitution evaluated strictly out-of-sample without hyperparameter tuning | Unbiased generalization test |
+| **7** | **Feature Schema Versioning** | Every feature vector and model bundle carries `FEATURE_VERSION = 1`; mismatched models fail closed | Prevents stale model deployment |
+| **8** | **Zero Network Dependency** | The security-critical boot path operates completely offline; zero `requests`/`urllib`/`socket` imports | Air-gapped boot integrity |
 
 ---
 
@@ -113,7 +115,7 @@ Evaluated across 67 test boot cycles, 5 realistic attack scenarios, and 3 benign
 - **Continuous Behavioral Detector Evaluation**: **Sample-Level ROC-AUC = 0.9370**, **PR-AUC = 0.9459** (Evaluated across all continuous telemetry samples & drift sequences)
 - **Benign False HALTs**: **0** (Verified 0 false halts across cold cache, legitimate upgrades, and CPU load)
 - **Held-Out A5 Evaluation**: **WARN + REDUCED_TRUST** (Evaluated strictly out-of-sample; top robust-z: `io_read_write_ratio` $+32000.0\sigma$, `io_bytes_read_kb` $+32.0\sigma$, `rss_s2_mb` $+31.3\sigma$)
-- **Test Suite Coverage**: **87%** (115 tests passing / 0 failures)
+- **Test Suite Coverage**: **87%** (116 tests passing / 0 failures)
 - **Forensic Audit Reports**: See [evaluation-forensics.md](docs/evaluation-forensics.md) and [attribution_audit.json](eval/forensic/attribution_audit.json).
 
 

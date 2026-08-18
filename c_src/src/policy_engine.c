@@ -103,6 +103,7 @@ PolicyDecisionResult bootsentry_evaluate_policy(
             }
         }
         strncpy(result.primary_attribution_feature, FEATURE_NAMES[max_z_idx], sizeof(result.primary_attribution_feature) - 1);
+        result.primary_attribution_feature[sizeof(result.primary_attribution_feature) - 1] = '\0';
     }
     result.primary_attribution_z = max_abs_z;
 
@@ -117,17 +118,6 @@ PolicyDecisionResult bootsentry_evaluate_policy(
     return result;
 }
 
-/* Default fallback C decision tree evaluation if not overridden by generated_trees.c */
-__attribute__((weak))
-float bootsentry_evaluate_isolation_forest(const float features[BOOTSENTRY_NUM_FEATURES]) {
-    /* Simple baseline check on memory and IO if trees not compiled */
-    if (features[16] > 100.0f || features[10] > 200.0f) {
-        return 0.58f;
-    }
-    return 0.20f;
-}
-
-__attribute__((weak))
 float bootsentry_evaluate_markov_sequence(void) {
     return 0.0f;
 }

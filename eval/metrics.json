@@ -15,7 +15,7 @@
     {
       "name": "A2: TOCTOU Config Swap",
       "verdict": "WARN",
-      "if_score": 0.27870361376203845,
+      "if_score": 0.7787954675239627,
       "top_attr": "+80.0sigma"
     },
     {
@@ -31,35 +31,35 @@
     {
       "name": "A5: Cross-SKU (Held-Out)",
       "verdict": "WARN",
-      "if_score": 0.5813708541867701,
+      "if_score": 0.6893481376675485,
       "top_attr": "+32000.0sigma"
     },
     {
       "name": "Benign: Cold Cache",
       "verdict": "PASS",
-      "risk_score": 0.39555913559138167
+      "risk_score": 0.411603147443229
     },
     {
       "name": "Benign: Firmware Upgrade",
       "verdict": "PASS",
-      "risk_score": 0.34006379474166987
+      "risk_score": 0.3622454263103573
     },
     {
       "name": "Benign: Host CPU Load",
       "verdict": "PASS",
-      "risk_score": 0.392867922690745
+      "risk_score": 0.3826348269070007
     }
   ],
   "sample_level_metrics": {
-    "roc_auc": 0.9370155038759691,
-    "pr_auc": 0.9458894254219101,
-    "fpr_at_95_tpr": 0.2558139534883721
+    "roc_auc": 0.9563953488372094,
+    "pr_auc": 0.9699253731343284,
+    "fpr_at_95_tpr": 0.046511627906976744
   },
   "ablations": {
     "isolation_forest_alone": {
-      "roc_auc": 0.9666666666666667,
-      "pr_auc": 0.8095238095238095,
-      "fpr_at_95_tpr": 0.1
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "fpr_at_95_tpr": 0.0
     },
     "markov_alone": {
       "roc_auc": 1.0,

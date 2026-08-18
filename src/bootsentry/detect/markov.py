@@ -18,6 +18,9 @@ class MarkovSequenceDetector:
     Detects reordered, omitted, or unexpected service launches (e.g. Attack A3).
     """
 
+    MARKOV_SIGMOID_SCALE: float = 4.0
+    UNSEEN_TRANSITION_PENALTY: float = 0.3
+
     def __init__(self, laplace_alpha: float = 1.0):
         self.laplace_alpha = laplace_alpha
         self.states: set[str] = set()
@@ -106,9 +109,9 @@ class MarkovSequenceDetector:
         # Anomaly score combining NLL and unseen transition penalties
         # Sigmoid over normalized NLL ratio + unseen boost
         nll_ratio = nll / (self.threshold_nll + 1e-6)
-        score = 1.0 / (1.0 + math.exp(-4.0 * (nll_ratio - 1.0)))
+        score = 1.0 / (1.0 + math.exp(-self.MARKOV_SIGMOID_SCALE * (nll_ratio - 1.0)))
         if unseen_count > 0:
-            score = min(1.0, score + 0.3 * unseen_count)
+            score = min(1.0, score + self.UNSEEN_TRANSITION_PENALTY * unseen_count)
 
         return float(min(1.0, max(0.0, score)))
 

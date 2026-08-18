@@ -10,7 +10,7 @@
 ## 1. Verified Release Metrics
 
 - **Release Commit**: `HEAD` (Synchronized with `origin/main`)
-- **Tests**: 115 passed / 0 failed (100% pass rate across 115 test cases in `tests/`)
+- **Tests**: 116 passed / 0 failed (100% pass rate across 116 test cases in `tests/`)
 - **Coverage**: 87% line coverage across `src/bootsentry/` (`pytest-cov`)
 - **Ruff Linting**: 0 errors / 0 warnings (`ruff check src/ tests/` with `E,W,F,I,B,BLE,UP,SIM`)
 

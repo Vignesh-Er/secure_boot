@@ -8,8 +8,8 @@
 | **M4** | 3-Layer Detectors (IF, Markov, EWMA), Rules Floor, Policy Engine | **COMPLETED** | 11 / 11 | 85% | `83284be` |
 | **M5** | Attack Testbed (A1-A5) & Benign Controls (Cold Cache, Load, Upgrade) | **COMPLETED** | 7 / 7 | 86% | `f30232c` |
 | **M6** | Real Dataset Collector, Model Trainer, Evaluation Report (`report.html`) | **COMPLETED** | 3 / 3 | 87% | `b96a90e` |
-| **M8** | Comprehensive Judge Documentation, Full CI Suite & Release Tagging | **COMPLETED** | 115 / 115 | **87%** | `a1d525e` |
-| **AUDIT** | Release Hardening: 0 Ruff Violations, Exception Hardening & Negative Tests | **COMPLETED** | 115 / 115 | **87%** | `HEAD` |
+| **M8** | Comprehensive Judge Documentation, Full CI Suite & Release Tagging | **COMPLETED** | 116 / 116 | **87%** | `a1d525e` |
+| **AUDIT** | Release Hardening: 0 Ruff Violations, Exception Hardening & Negative Tests | **COMPLETED** | 116 / 116 | **87%** | `HEAD` |
 
 
 
@@ -36,7 +36,7 @@
 | **ROC-AUC (1.0000 / 0.9370)** | `src/bootsentry/eval/evaluate.py` | `data/telemetry/normal_boots.jsonl` + Attack boots | Scenario-level and sample-level `roc_auc_score` | `eval/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
 
 | **FPR @ 95% TPR (0.0000)** | `src/bootsentry/eval/evaluate.py` | Full test partition with clean vs anomalous boots | Exact false positive rate at threshold achieving $\ge 95\%$ true positive rate | `eval/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
-| **Test Count (115)** | `tests/test_*.py` | Comprehensive test suite (115 test cases) | `pytest tests/` test collector execution | `eval/project_metrics.json` | Header Badge & Quickstart |
+| **Test Count (116)** | `tests/test_*.py` | Comprehensive test suite (116 test cases) | `pytest tests/` test collector execution | `eval/project_metrics.json` | Header Badge & Quickstart |
 | **Coverage (87%)** | `tests/` across `src/bootsentry/` | Entire codebase line execution tracking | `pytest-cov` statement coverage analysis | `eval/project_metrics.json` | Header Badge & Quickstart |
 
 

@@ -30,34 +30,40 @@ def train_all_models(
     if len(normal_records) < 10:
         raise ValueError(f"Insufficient normal training records ({len(normal_records)}), minimum 10 required.")
 
-    print(f"[*] Training BootSentry anomaly models on {len(normal_records)} clean baseline boots...")
+    # Use only the first 80% for training; the last 20% is reserved for
+    # out-of-sample evaluation in evaluate.py (matching its test_normal split).
+    train_cutoff = int(len(normal_records) * 0.8)
+    train_records = normal_records[:train_cutoff] if len(normal_records) > 12 else normal_records
+
+    print(f"[*] Training BootSentry anomaly models on {len(train_records)} clean baseline boots "
+          f"(80% of {len(normal_records)} total, last 20% reserved for evaluation)...")
 
     # 1. Train Isolation Forest
     print("  [+] Fitting Isolation Forest (n_estimators=200, StandardScaler)...")
     if_detector = IsolationForestDetector(n_estimators=200, contamination="auto", random_state=42)
-    if_detector.fit(normal_records)
+    if_detector.fit(train_records)
     if_file = models_path / "isolation_forest.joblib"
     if_detector.save(if_file)
 
     # 2. Train Markov Sequence Model
     print("  [+] Fitting 1st-order Markov Sequence Model (Laplace smoothing)...")
     markov_detector = MarkovSequenceDetector(laplace_alpha=1.0)
-    markov_detector.fit(normal_records)
+    markov_detector.fit(train_records)
     markov_file = models_path / "markov_sequence.joblib"
     markov_detector.save(markov_file)
 
     # 3. Train EWMA Drift Monitor
     print("  [+] Calibrating EWMA / CUSUM Multi-Boot Drift Monitor...")
-    if_scores = [if_detector.score_record(r) for r in normal_records]
+    if_scores = [if_detector.score_record(r) for r in train_records]
     ewma_monitor = EWMADriftMonitor(alpha=0.2, cusum_k=0.5, cusum_h=4.0)
-    ewma_monitor.fit(normal_records, if_scores=if_scores)
+    ewma_monitor.fit(train_records, if_scores=if_scores)
     ewma_file = models_path / "ewma_monitor.joblib"
     ewma_monitor.save(ewma_file)
 
     # 4. Train Attribution Engine (Median / MAD references)
     print("  [+] Computing Median & MAD statistics for 28 continuous features...")
     attribution_engine = AttributionEngine()
-    attribution_engine.fit(normal_records)
+    attribution_engine.fit(train_records)
     attr_file = models_path / "attribution_engine.joblib"
     attribution_engine.save(attr_file)
 

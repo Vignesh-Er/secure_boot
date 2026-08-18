@@ -41,3 +41,15 @@ In factory provisioning, new device SKUs must undergo automated golden boot cycl
 In this implementation, the software TPM PCR bank is emulated using SHA-256 cryptographic state extension in Python memory. In a production deployment:
 - PCR registers should be physically hosted on a discrete TPM 2.0 or integrated into a hardware-isolated Secure Enclave / TrustZone.
 - Attestation quotes should be signed by an Endorsement Key (EK) protected by hardware-enforced physical tamper resistance.
+
+---
+
+## 5. Host OS Counter Sampling Granularity (Windows vs. Embedded PMU)
+
+### Sampling Granularity on Host Platforms
+On Windows host platforms, rapid in-process stage execution (sub-10ms) means certain OS process counters (context switches, minor page faults, disk bytes read/written) report zero deltas via standard `psutil` sampling due to OS timer resolution limitations.
+
+**Resolution & Hardware PMU**:
+- BootSentry's feature extractor handles zero-variance features safely via Zero-MAD regularization ($1.4826 \cdot \text{MAD} + 1e\text{-}6$).
+- The reference C99 microkernel implementation (`c_src/src/pmu_driver.c`) interfaces directly with hardware performance monitoring units (`__rdtsc` on x86_64, `pmccntr_el0` on ARM64) to capture cycle-accurate instruction retirement and cache miss counters without host OS abstraction overhead.
+

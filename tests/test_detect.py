@@ -68,6 +68,20 @@ class TestIsolationForestDetector:
         loaded = IsolationForestDetector.load(model_file)
         assert loaded.score_record(normal_test) == pytest.approx(score_normal, rel=1e-3)
 
+    def test_export_c_code(self, normal_training_records, tmp_path):
+        """Verify C99 decision tree code generator outputs valid C syntax with real tree paths."""
+        detector = IsolationForestDetector(n_estimators=10, random_state=42)
+        detector.fit(normal_training_records)
+        c_file = tmp_path / "generated_trees.c"
+        detector.export_c_code(c_file)
+        assert c_file.exists()
+        content = c_file.read_text(encoding="utf-8")
+        assert "bootsentry_evaluate_isolation_forest" in content
+        assert "evaluate_tree_0" in content
+        assert "SCALER_MEANS" in content
+        assert "SCALER_SCALES" in content
+        assert "return" in content
+
 
 class TestMarkovSequenceDetector:
     def test_sequence_anomaly_detection(self, normal_training_records, tmp_path):
@@ -203,12 +217,30 @@ class TestAttributionEngine:
 
 class TestBaselines:
     def test_ocsvm_and_lof(self, normal_training_records):
+        anom_rec = BootRecord(
+            boot_id="test-anom-baseline",
+            timestamp_iso="2026-08-17T08:00:00Z",
+            total_boot_time_ms=500.0,
+            stages={
+                "S0": StageTelemetry("S0", t_verify_ms=5.0, t_exec_ms=2.0, t_total_ms=7.0, rss_mb=10.0),
+                "S1": StageTelemetry("S1", t_verify_ms=10.0, t_exec_ms=5.0, t_total_ms=15.0, rss_mb=12.0),
+                "S2": StageTelemetry("S2", t_verify_ms=15.0, t_exec_ms=450.0, t_total_ms=465.0, rss_mb=80.0),
+                "S3": StageTelemetry("S3", t_verify_ms=0.0, t_exec_ms=15.0, t_total_ms=15.0, rss_mb=15.0),
+            },
+        )
+
         ocsvm = BaselineOneClassSVM(nu=0.1)
         ocsvm.fit(normal_training_records)
-        s_svm = ocsvm.score_record(normal_training_records[0])
-        assert 0.0 <= s_svm <= 1.0
+        s_svm_norm = ocsvm.score_record(normal_training_records[0])
+        s_svm_anom = ocsvm.score_record(anom_rec)
+        assert 0.0 <= s_svm_norm <= 1.0
+        assert 0.0 <= s_svm_anom <= 1.0
+        assert s_svm_anom >= s_svm_norm
 
         lof = BaselineLocalOutlierFactor(n_neighbors=10)
         lof.fit(normal_training_records)
-        s_lof = lof.score_record(normal_training_records[0])
-        assert 0.0 <= s_lof <= 1.0
+        s_lof_norm = lof.score_record(normal_training_records[0])
+        s_lof_anom = lof.score_record(anom_rec)
+        assert 0.0 <= s_lof_norm <= 1.0
+        assert 0.0 <= s_lof_anom <= 1.0
+        assert s_lof_anom >= s_lof_norm
