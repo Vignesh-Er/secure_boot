@@ -10,9 +10,10 @@
 ## 1. Verified Release Metrics
 
 - **Release Commit**: `HEAD` (Synchronized with `origin/main`)
-- **Tests**: 86 passed / 0 failed (100% pass rate across 86 test cases in `tests/`)
+- **Tests**: 90 passed / 0 failed (100% pass rate across 90 test cases in `tests/`)
 - **Coverage**: 84% line coverage across `src/bootsentry/` (`pytest-cov`)
 - **Ruff Linting**: 0 errors / 0 warnings (`ruff check src/ tests/` with `E,W,F,I,B,BLE,UP,SIM`)
+
 
 - **CI Matrix**: GitHub Actions automated pipeline passing on Python 3.10, 3.11, 3.12
 - **Python Versions Supported**: Python 3.10, 3.11, 3.12 (AMD64 & ARM64)

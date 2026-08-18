@@ -30,8 +30,12 @@ dev = [
     "ruff>=0.5.0",
 ]
 
+[project.scripts]
+bootsentry = "bootsentry.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
+
 
 [tool.ruff]
 line-length = 100

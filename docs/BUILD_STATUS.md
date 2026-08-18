@@ -36,8 +36,9 @@
 | **ROC-AUC (1.0000 / 0.9370)** | `src/bootsentry/eval/evaluate.py` | `data/telemetry/normal_boots.jsonl` + Attack boots | Scenario-level and sample-level `roc_auc_score` | `eval/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
 
 | **FPR @ 95% TPR (0.0000)** | `src/bootsentry/eval/evaluate.py` | Full test partition with clean vs anomalous boots | Exact false positive rate at threshold achieving $\ge 95\%$ true positive rate | `eval/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
-| **Test Count (86)** | `tests/test_*.py` | Comprehensive test suite (86 test cases) | `pytest tests/` test collector execution | `eval/project_metrics.json` | Header Badge & Quickstart |
+| **Test Count (90)** | `tests/test_*.py` | Comprehensive test suite (90 test cases) | `pytest tests/` test collector execution | `eval/project_metrics.json` | Header Badge & Quickstart |
 | **Coverage (84%)** | `tests/` across `src/bootsentry/` | Entire codebase line execution tracking | `pytest-cov` statement coverage analysis | `eval/project_metrics.json` | Header Badge & Quickstart |
+
 | **A5 Held-Out Result** | `src/bootsentry/attacks/cross_sku.py` | Strictly held-out Cross-SKU boots (`NUMA/Edge` mismatch) | Out-of-sample spatial feature evaluation with frozen Isolation Forest model | `eval/metrics.json`, `eval/project_metrics.json` | Attack Matrix & Architecture |
 
 

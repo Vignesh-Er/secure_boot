@@ -113,7 +113,7 @@ Evaluated across 67 test boot cycles, 5 realistic attack scenarios, and 3 benign
 - **Continuous Behavioral Detector Evaluation**: **Sample-Level ROC-AUC = 0.9370**, **PR-AUC = 0.9459** (Evaluated across all continuous telemetry samples & drift sequences)
 - **Benign False HALTs**: **0** (Verified 0 false halts across cold cache, legitimate upgrades, and CPU load)
 - **Held-Out A5 Evaluation**: **WARN + REDUCED_TRUST** (Evaluated strictly out-of-sample; top robust-z: `io_read_write_ratio` $+32000.0\sigma$, `io_bytes_read_kb` $+32.0\sigma$, `rss_s2_mb` $+31.3\sigma$)
-- **Test Suite Coverage**: **84%** (86 tests passing / 0 failures)
+- **Test Suite Coverage**: **84%** (90 tests passing / 0 failures)
 - **Forensic Audit Reports**: See [evaluation-forensics.md](docs/evaluation-forensics.md) and [attribution_audit.json](eval/forensic/attribution_audit.json).
 
 
@@ -151,9 +151,10 @@ make boot
 
 ### 5. Run the Full Test Suite
 ```bash
-# Run 86 unit, integration, and attack tests with code coverage
+# Run 90 unit, integration, and attack tests with code coverage
 make test
 ```
+
 
 
 ### 6. Collect Real Process Telemetry Dataset

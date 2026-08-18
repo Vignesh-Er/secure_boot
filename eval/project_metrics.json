@@ -2,7 +2,7 @@
   "project_name": "BootSentry",
   "description": "AI-Assisted Secure Boot & Post-Quantum Integrity Verification",
   "pqc_algorithm": "ML-DSA-65",
-  "test_count": 86,
+  "test_count": 90,
   "test_failures": 0,
   "coverage_percent": 84,
   "ruff_errors": 0,
@@ -12,7 +12,7 @@
   "benign_false_halts": 0,
   "a5_held_out": true,
   "security_invariants_verified": 8,
-  "git_commit": "3c0e16c78b0a764ac2a5458e3987c9ba4e60d73a",
+  "git_commit": "1044c0f9941853f3640159fbe2d53ff495e0ba02",
   "python_version": "3.12.10",
   "platform": "Windows-11-10.0.26200-SP0"
 }

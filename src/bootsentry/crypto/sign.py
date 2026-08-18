@@ -52,14 +52,21 @@ def main() -> None:
     stages_dir = Path(args.stages_dir)
     keys_dir = Path(args.keys_dir)
 
-    for stage_id in ["s0", "s1", "s2", "s3"]:
-        m_file = stages_dir / f"{stage_id}_manifest.json"
-        k_file = keys_dir / f"{stage_id}_private.json"
+    stage_signers = [
+        ("s1", "s0"),
+        ("s2", "s1"),
+        ("s3", "s2"),
+    ]
+
+    for target_stage, signer_stage in stage_signers:
+        m_file = stages_dir / f"{target_stage}_manifest.json"
+        k_file = keys_dir / f"{signer_stage}_private.json"
         if m_file.exists() and k_file.exists():
             sign_stage_manifest_file(m_file, k_file)
-            print(f"[OK] Signed {stage_id.upper()} manifest ({m_file})")
+            print(f"[OK] Signed {target_stage.upper()} manifest with {signer_stage.upper()} key ({m_file})")
         else:
-            print(f"[-] Skipping {stage_id.upper()} (missing manifest or key)")
+            print(f"[-] Skipping {target_stage.upper()} (missing manifest {m_file} or key {k_file})")
+
 
 
 if __name__ == "__main__":

@@ -214,9 +214,10 @@ SAFE_DEMO_SCENARIOS: dict[str, dict[str, Any]] = {
         "reason": "Authentic signatures verified; Out-of-Sample Behavioral Anomaly Detected on Foreign SKU Profile",
         "attestation": "REDUCED_TRUST (Cross-SKU Anomaly Warning)",
         "attributions": [
-            {"feature": "rss_s2_mb", "observed": "64.0 MB", "baseline": "14.0 MB", "sigma": "+5.2sigma"},
-            {"feature": "t_exec_s2", "observed": "38.0 ms", "baseline": "10.0 ms", "sigma": "+4.1sigma"},
-            {"feature": "ctx_switches_vol", "observed": "28", "baseline": "8", "sigma": "+2.9sigma"},
+            {"feature": "io_read_write_ratio", "observed": "3200.0", "baseline": "1.0", "sigma": "+32000.0sigma"},
+            {"feature": "io_bytes_read_kb", "observed": "16384.0 KB", "baseline": "32.0 KB", "sigma": "+32.0sigma"},
+            {"feature": "rss_s2_mb", "observed": "128.0 MB", "baseline": "32.0 MB", "sigma": "+31.3sigma"},
         ],
+
     },
 }
