@@ -76,7 +76,7 @@ class TestEventLog:
         replayed_bank = log.replay_pcrs()
         is_consistent, msg = log.verify_consistency(replayed_bank)
         assert is_consistent is True
-        assert "perfectly reproduces" in msg
+        assert "reproduces PCR bank state" in msg
 
     def test_event_log_tamper_detection(self):
         log = EventLog()
