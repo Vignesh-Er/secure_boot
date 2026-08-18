@@ -12,7 +12,7 @@
   "benign_false_halts": 0,
   "a5_held_out": true,
   "security_invariants_verified": 8,
-  "git_commit": "9dd95b94a89d4efad4babc7256483568901774bf",
+  "git_commit": "595b755c36256bf3e8a71b2de8036ccd5ec24972",
   "python_version": "3.12.10",
   "platform": "Windows-11-10.0.26200-SP0"
 }
