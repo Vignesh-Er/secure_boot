@@ -20,6 +20,10 @@ BootSentry enforces 8 formal security invariants that must never be bypassed by 
 7. **Feature Schema Versioning**: Every feature vector carries `FEATURE_VERSION = 1`. Mismatched versions fail closed.
 8. **Zero Network Dependency in Critical Boot Path**: The security-critical boot sequence operates completely offline.
 
+## Demo Keys Notice
+
+Keys stored under `config/keys/` and `models/` are non-production test vectors generated for standalone demonstration and evaluation reproducibility. Never deploy these sample keys to production hardware roots of trust.
+
 ## Reporting a Vulnerability
 
 If you discover a security vulnerability within BootSentry, please submit a responsible disclosure report to the core security engineering team:

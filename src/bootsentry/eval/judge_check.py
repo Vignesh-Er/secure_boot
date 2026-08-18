@@ -254,7 +254,7 @@ def run_judge_check() -> int:
 
     if overall_passed:
         banner = Panel(
-            "[bold green][OK] BOOTSENTRY IS 100% REPRODUCIBLE, VERIFIED, AND JUDGE-READY FOR RELEASE[/bold green]\n"
+            "[bold green][OK] BOOTSENTRY IS VERIFIED, REPRODUCIBLE IN DOCUMENTED ENVIRONMENT, AND JUDGE-READY FOR RELEASE[/bold green]\n"
             f"[dim]Commit: {git_commit} | Python: {platform.python_version()} | Platform: {platform.system()} {platform.machine()}[/dim]",
             border_style="green",
             title="[bold green]RELEASE STATUS: READY[/bold green]",

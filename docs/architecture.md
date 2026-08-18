@@ -96,7 +96,7 @@ BootSentry decomposes boot execution into 4 distinct OS process stages:
 ## 3. Post-Quantum Cryptography & Canonical Manifests
 
 ### Manifest Schema (RFC 8785 Canonical JSON)
-Manifests are serialized using RFC 8785 canonical JSON formatting (strictly sorted keys, whitespace-free, standard float representation) to guarantee bit-exact signature verification across heterogeneous platforms:
+Manifests are serialized using RFC 8785 canonical JSON formatting (strictly sorted keys, whitespace-free, standard float representation) to ensure bit-exact signature verification across heterogeneous platforms:
 
 ```json
 {

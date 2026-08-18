@@ -1,0 +1,18 @@
+# Enforce consistent line endings and binary preservation across Windows, Linux, and macOS
+* text=auto eol=lf
+
+# Raw binary payloads and model weights must NEVER have CRLF conversion
+*.bin binary
+*.joblib binary
+*.png binary
+*.jpg binary
+*.ico binary
+
+# JSON, JSONL, source code
+*.json text eol=lf
+*.jsonl text eol=lf
+*.py text eol=lf
+*.c text eol=lf
+*.h text eol=lf
+*.md text eol=lf
+Makefile text eol=lf

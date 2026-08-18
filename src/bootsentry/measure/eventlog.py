@@ -110,7 +110,7 @@ class EventLog:
                     False,
                     f"PCR[{idx}] mismatch: actual={actual_val[:12]}..., replayed={expected_val[:12]}...",
                 )
-        return True, "Event log perfectly reproduces PCR bank state."
+        return True, "Event log consistently reproduces PCR bank state."
 
     def to_list(self) -> list[dict[str, Any]]:
         return [e.to_dict() for e in self.entries]
