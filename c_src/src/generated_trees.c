@@ -3,25 +3,25 @@
 
 /* Transpiled Isolation Forest Anomaly Evaluator (8 Real Decision Trees) */
 static const float SCALER_MEANS[28] = {
-    35.786808f, 32.922233f, 33.621608f, 2.778467f, 34.636975f, 24.999508f, 311.570858f, 544.476750f, 205.166667f, 164.135833f, 184.651667f, 194.910833f, 205.166667f, 182.500000f, 0.000000f, 0.000000f, 90512.500000f, 0.000000f, 1571.216064f, 21.932292f, 71.636274f, 0.075551f, 0.137572f, 0.118240f, 0.538759f, 0.202753f, 393.228333f, 36.457500f
+    30.998292f, 32.568642f, 31.043000f, 2.471383f, 23.950417f, 23.047208f, 204.324558f, 416.204517f, 205.743333f, 164.595000f, 185.167500f, 195.455833f, 205.743333f, 210.416667f, 0.000000f, 0.000000f, 91712.500000f, 0.000000f, 1571.225098f, 21.944092f, 71.598132f, 0.083946f, 0.142007f, 0.134612f, 0.484043f, 0.236029f, 268.227500f, 42.969167f
 };
 static const float SCALER_SCALES[28] = {
-    6.746664f, 6.424490f, 3.426707f, 0.258484f, 24.845136f, 3.203537f, 177.169958f, 185.670394f, 0.034960f, 0.026286f, 0.030231f, 0.030946f, 0.034960f, 103.772588f, 1.000000f, 1.000000f, 9.682458f, 1.000000f, 0.018279f, 0.026223f, 0.084918f, 0.018755f, 0.067462f, 0.034811f, 0.120121f, 0.051100f, 177.559207f, 25.780608f
+    5.106623f, 6.942992f, 4.813788f, 0.357335f, 4.353770f, 3.109966f, 66.249141f, 89.601742f, 0.067495f, 0.053774f, 0.062600f, 0.064866f, 0.067495f, 68.540084f, 1.000000f, 1.000000f, 20.866640f, 1.000000f, 0.013905f, 0.021474f, 0.069494f, 0.021068f, 0.040903f, 0.029270f, 0.071856f, 0.058008f, 75.699415f, 22.212538f
 };
-static const float SCORE_THRESHOLD = 0.564787f;
+static const float SCORE_THRESHOLD = 0.560214f;
 static const int NUM_EXPORTED_TREES = 8;
 
 static float evaluate_tree_0(const float x[BOOTSENTRY_NUM_FEATURES]) {
-    if (x[1] <= -0.013256f) {
-        if (x[27] <= 0.123786f) {
-            if (x[25] <= -1.225363f) {
-                if (x[7] <= 2.083753f) {
+    if (x[1] <= 0.084949f) {
+        if (x[27] <= 1.852117f) {
+            if (x[25] <= -0.754960f) {
+                if (x[7] <= 0.119664f) {
                     return (float)4;
                 } else {
                     return (float)4;
                 }
             } else {
-                if (x[16] <= -0.134853f) {
+                if (x[16] <= -0.286673f) {
                     return (float)4;
                 } else {
                     return (float)4;
@@ -31,13 +31,13 @@ static float evaluate_tree_0(const float x[BOOTSENTRY_NUM_FEATURES]) {
             return (float)2;
         }
     } else {
-        if (x[21] <= -0.062520f) {
+        if (x[21] <= -1.601754f) {
             return (float)2;
         } else {
-            if (x[5] <= -1.299130f) {
+            if (x[5] <= -0.976405f) {
                 return (float)3;
             } else {
-                if (x[24] <= -0.269658f) {
+                if (x[24] <= -0.112079f) {
                     return (float)4;
                 } else {
                     return (float)4;
@@ -48,100 +48,104 @@ static float evaluate_tree_0(const float x[BOOTSENTRY_NUM_FEATURES]) {
 }
 
 static float evaluate_tree_1(const float x[BOOTSENTRY_NUM_FEATURES]) {
-    if (x[2] <= -0.021058f) {
-        if (x[2] <= -1.270210f) {
-            if (x[23] <= -0.588912f) {
+    if (x[2] <= 0.055618f) {
+        if (x[2] <= -1.125674f) {
+            if (x[23] <= -0.918416f) {
                 return (float)3;
             } else {
                 return (float)3;
             }
         } else {
-            if (x[7] <= -0.033493f) {
-                if (x[10] <= -0.254565f) {
+            if (x[7] <= 0.075046f) {
+                if (x[10] <= -0.542645f) {
                     return (float)4;
                 } else {
                     return (float)4;
                 }
             } else {
-                return (float)3;
+                if (x[27] <= 0.166639f) {
+                    return (float)4;
+                } else {
+                    return (float)4;
+                }
             }
         }
     } else {
-        if (x[27] <= -0.666507f) {
-            return (float)2;
-        } else {
-            if (x[8] <= -1.031891f) {
+        if (x[8] <= -0.805795f) {
+            if (x[10] <= -1.329043f) {
                 return (float)3;
             } else {
-                if (x[10] <= 0.071782f) {
+                if (x[6] <= 2.328585f) {
                     return (float)4;
                 } else {
                     return (float)4;
                 }
             }
+        } else {
+            return (float)2;
         }
     }
 }
 
 static float evaluate_tree_2(const float x[BOOTSENTRY_NUM_FEATURES]) {
-    if (x[18] <= -0.424249f) {
-        if (x[4] <= -0.389770f) {
-            if (x[13] <= 0.749799f) {
-                return (float)3;
-            } else {
-                return (float)3;
-            }
+    if (x[18] <= -0.554460f) {
+        if (x[4] <= -1.215298f) {
+            return (float)2;
         } else {
-            if (x[12] <= 0.527926f) {
+            if (x[13] <= -0.865831f) {
                 return (float)3;
             } else {
                 return (float)3;
             }
         }
     } else {
-        if (x[8] <= -1.630875f) {
-            return (float)2;
-        } else {
-            if (x[22] <= 1.478518f) {
-                if (x[3] <= -0.026914f) {
+        if (x[12] <= 0.362004f) {
+            if (x[20] <= -0.034489f) {
+                if (x[3] <= 0.215656f) {
                     return (float)4;
                 } else {
                     return (float)4;
                 }
             } else {
                 return (float)3;
+            }
+        } else {
+            if (x[5] <= -0.769525f) {
+                if (x[27] <= 0.547870f) {
+                    return (float)4;
+                } else {
+                    return (float)4;
+                }
+            } else {
+                if (x[3] <= -0.261456f) {
+                    return (float)4;
+                } else {
+                    return (float)4;
+                }
             }
         }
     }
 }
 
 static float evaluate_tree_3(const float x[BOOTSENTRY_NUM_FEATURES]) {
-    if (x[2] <= -0.736365f) {
-        if (x[16] <= -0.360607f) {
+    if (x[2] <= -0.592940f) {
+        if (x[16] <= -0.566015f) {
             return (float)2;
         } else {
-            return (float)2;
-        }
-    } else {
-        if (x[24] <= 0.048052f) {
-            if (x[5] <= 0.305024f) {
-                if (x[3] <= -0.316472f) {
-                    return (float)4;
-                } else {
-                    return (float)4;
-                }
-            } else {
-                if (x[25] <= 1.466977f) {
-                    return (float)4;
-                } else {
-                    return (float)4;
-                }
-            }
-        } else {
-            if (x[23] <= -1.557985f) {
+            if (x[24] <= 0.970493f) {
                 return (float)3;
             } else {
-                if (x[10] <= -0.283757f) {
+                return (float)3;
+            }
+        }
+    } else {
+        if (x[5] <= -0.874797f) {
+            return (float)2;
+        } else {
+            if (x[3] <= -0.678117f) {
+                return (float)3;
+            } else {
+                if (x[25] <= 1.716300f) {
                     return (float)4;
                 } else {
                     return (float)4;
@@ -152,66 +156,66 @@ static float evaluate_tree_3(const float x[BOOTSENTRY_NUM_FEATURES]) {
 }
 
 static float evaluate_tree_4(const float x[BOOTSENTRY_NUM_FEATURES]) {
-    if (x[21] <= -0.603548f) {
-        if (x[10] <= 0.021762f) {
-            if (x[2] <= -0.020309f) {
+    if (x[21] <= -0.555840f) {
+        if (x[10] <= 0.249192f) {
+            return (float)2;
+        } else {
+            if (x[2] <= -1.695342f) {
                 return (float)3;
             } else {
-                if (x[13] <= 1.457044f) {
+                if (x[13] <= 1.819560f) {
                     return (float)4;
                 } else {
                     return (float)4;
                 }
             }
-        } else {
-            return (float)2;
         }
     } else {
-        if (x[24] <= -0.095244f) {
-            if (x[1] <= 1.131584f) {
-                if (x[26] <= -0.653644f) {
+        if (x[24] <= -0.610044f) {
+            if (x[1] <= 1.022019f) {
+                if (x[26] <= -0.946843f) {
                     return (float)4;
                 } else {
                     return (float)4;
                 }
             } else {
-                if (x[22] <= 0.860404f) {
+                if (x[22] <= -0.025090f) {
                     return (float)4;
                 } else {
                     return (float)4;
                 }
             }
         } else {
-            if (x[0] <= 0.691863f) {
-                if (x[21] <= -0.013400f) {
+            if (x[0] <= 0.330832f) {
+                return (float)3;
+            } else {
+                if (x[21] <= 0.537313f) {
                     return (float)4;
                 } else {
                     return (float)4;
                 }
-            } else {
-                return (float)3;
             }
         }
     }
 }
 
 static float evaluate_tree_5(const float x[BOOTSENTRY_NUM_FEATURES]) {
-    if (x[27] <= 1.077436f) {
-        if (x[26] <= -0.468818f) {
-            if (x[7] <= -0.452764f) {
-                if (x[27] <= -0.212120f) {
+    if (x[27] <= 1.178747f) {
+        if (x[26] <= -0.658211f) {
+            if (x[7] <= -0.895648f) {
+                return (float)3;
+            } else {
+                return (float)3;
+            }
+        } else {
+            if (x[27] <= 0.164306f) {
+                if (x[12] <= -0.854497f) {
                     return (float)4;
                 } else {
                     return (float)4;
                 }
             } else {
-                return (float)3;
-            }
-        } else {
-            if (x[12] <= -1.562377f) {
-                return (float)3;
-            } else {
-                if (x[2] <= -1.172802f) {
+                if (x[2] <= -1.137671f) {
                     return (float)4;
                 } else {
                     return (float)4;
@@ -219,7 +223,7 @@ static float evaluate_tree_5(const float x[BOOTSENTRY_NUM_FEATURES]) {
             }
         }
     } else {
-        if (x[2] <= 1.415414f) {
+        if (x[2] <= -0.298025f) {
             return (float)2;
         } else {
             return (float)2;
@@ -228,32 +232,32 @@ static float evaluate_tree_5(const float x[BOOTSENTRY_NUM_FEATURES]) {
 }
 
 static float evaluate_tree_6(const float x[BOOTSENTRY_NUM_FEATURES]) {
-    if (x[26] <= -0.565829f) {
-        if (x[24] <= -1.068240f) {
-            if (x[7] <= -0.813423f) {
+    if (x[26] <= -0.775431f) {
+        if (x[24] <= -0.799875f) {
+            if (x[7] <= -0.795216f) {
                 return (float)3;
             } else {
                 return (float)3;
             }
         } else {
-            if (x[24] <= -0.769564f) {
-                return (float)3;
-            } else {
-                return (float)3;
-            }
+            return (float)2;
         }
     } else {
-        if (x[7] <= -0.626124f) {
-            if (x[12] <= -0.063866f) {
+        if (x[24] <= -0.151922f) {
+            if (x[7] <= -0.669517f) {
                 return (float)3;
             } else {
-                return (float)3;
+                if (x[12] <= -0.302145f) {
+                    return (float)4;
+                } else {
+                    return (float)4;
+                }
             }
         } else {
-            if (x[21] <= -1.547992f) {
+            if (x[21] <= -1.620561f) {
                 return (float)3;
             } else {
-                if (x[23] <= -0.631716f) {
+                if (x[23] <= 0.741188f) {
                     return (float)4;
                 } else {
                     return (float)4;
@@ -264,40 +268,36 @@ static float evaluate_tree_6(const float x[BOOTSENTRY_NUM_FEATURES]) {
 }
 
 static float evaluate_tree_7(const float x[BOOTSENTRY_NUM_FEATURES]) {
-    if (x[5] <= -0.116203f) {
-        if (x[20] <= 0.193311f) {
-            if (x[2] <= -1.810038f) {
+    if (x[5] <= -0.418955f) {
+        if (x[20] <= -0.239344f) {
+            if (x[2] <= -1.534461f) {
                 return (float)3;
             } else {
-                if (x[6] <= 0.454119f) {
-                    return (float)4;
-                } else {
-                    return (float)4;
-                }
+                return (float)3;
             }
         } else {
-            if (x[0] <= 0.740669f) {
+            if (x[6] <= -0.514259f) {
                 return (float)3;
             } else {
-                if (x[2] <= -0.120693f) {
-                    return (float)4;
-                } else {
-                    return (float)4;
-                }
+                return (float)3;
             }
         }
     } else {
-        if (x[20] <= -0.671624f) {
-            return (float)2;
-        } else {
-            if (x[10] <= 0.914537f) {
-                if (x[24] <= -0.823475f) {
+        if (x[0] <= 1.099924f) {
+            if (x[2] <= -0.864166f) {
+                return (float)3;
+            } else {
+                if (x[20] <= -0.442678f) {
                     return (float)4;
                 } else {
                     return (float)4;
                 }
+            }
+        } else {
+            if (x[10] <= -1.084854f) {
+                return (float)3;
             } else {
-                if (x[5] <= 1.195812f) {
+                if (x[24] <= -0.609405f) {
                     return (float)4;
                 } else {
                     return (float)4;
