@@ -11,8 +11,6 @@
 | **M8** | Comprehensive Judge Documentation, Full CI Suite & Release Tagging | **COMPLETED** | 116 / 116 | **87%** | `a1d525e` |
 | **AUDIT** | Release Hardening: 0 Ruff Violations, Exception Hardening & Negative Tests | **COMPLETED** | 116 / 116 | **87%** | `HEAD` |
 
-
-
 ---
 
 ## Non-Negotiable Invariants Audit
@@ -32,15 +30,9 @@
 
 | Metric | Source Code Implementation | Dataset Input | Calculation / Methodology | Output File | README Reference |
 |---|---|---|---|---|---|
-| **PR-AUC (1.0000 / 0.9459)** | `src/bootsentry/eval/evaluate.py` | `data/telemetry/normal_boots.jsonl` + Attack boots | Scenario-level and sample-level `average_precision_score` | `eval/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
-| **ROC-AUC (1.0000 / 0.9370)** | `src/bootsentry/eval/evaluate.py` | `data/telemetry/normal_boots.jsonl` + Attack boots | Scenario-level and sample-level `roc_auc_score` | `eval/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
-
-| **FPR @ 95% TPR (0.0000)** | `src/bootsentry/eval/evaluate.py` | Full test partition with clean vs anomalous boots | Exact false positive rate at threshold achieving $\ge 95\%$ true positive rate | `eval/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
+| **PR-AUC (0.9667 / 0.9820)** | `src/bootsentry/eval/evaluate.py` | Baseline boots + Attack boots | Scenario-level ($n_{pos}=5$) and sample-level ($n_{pos}=25$) `average_precision_score` | `eval/baseline_before/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
+| **ROC-AUC (0.9953 / 0.9874)** | `src/bootsentry/eval/evaluate.py` | Baseline boots + Attack boots | Scenario-level ($n_{pos}=5$) and sample-level ($n_{pos}=25$) `roc_auc_score` | `eval/baseline_before/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
+| **FPR @ 95% TPR (0.0233 / 0.0698)** | `src/bootsentry/eval/evaluate.py` | Full test partition with clean vs anomalous boots | Exact false positive rate at threshold achieving $\ge 95\%$ true positive rate | `eval/baseline_before/metrics.json`, `eval/project_metrics.json` | Evaluation & Benchmarks |
 | **Test Count (116)** | `tests/test_*.py` | Comprehensive test suite (116 test cases) | `pytest tests/` test collector execution | `eval/project_metrics.json` | Header Badge & Quickstart |
 | **Coverage (87%)** | `tests/` across `src/bootsentry/` | Entire codebase line execution tracking | `pytest-cov` statement coverage analysis | `eval/project_metrics.json` | Header Badge & Quickstart |
-
-
-| **A5 Held-Out Result** | `src/bootsentry/attacks/cross_sku.py` | Strictly held-out Cross-SKU boots (`NUMA/Edge` mismatch) | Out-of-sample spatial feature evaluation with frozen Isolation Forest model | `eval/metrics.json`, `eval/project_metrics.json` | Attack Matrix & Architecture |
-
-
-
+| **A5 Held-Out Result** | `src/bootsentry/attacks/cross_sku.py` | Strictly held-out Cross-SKU boots (`NUMA/Edge` mismatch) | Out-of-sample spatial feature evaluation with frozen Isolation Forest model | `eval/baseline_before/metrics.json`, `eval/project_metrics.json` | Attack Matrix & Architecture |

@@ -1,6 +1,5 @@
 # BootSentry Security Analysis & Safety Invariant Verification
 
-
 ## 1. Mathematical Model of Gates & Policy
 
 Let the system boot sequence be modeled as a sequence of stages $S = \langle S_0, S_1, S_2, S_3 \rangle$.
@@ -45,9 +44,16 @@ $$\mathcal{D}(\mathbf{x}) = \begin{cases}
 
 **Proof**:
 Suppose $\mathcal{D}(\mathbf{x}) = \text{HALT}$. By the definition of $\mathcal{D}(\mathbf{x})$, $\mathcal{D}(\mathbf{x}) = \text{HALT} \iff \mathcal{R}(\mathbf{x}) = 0$.
-The deterministic rule floor $\mathcal{R}(\mathbf{x}) = 0$ requires at least one deterministic rule violation (`RULE_SVN_ROLLBACK`, `RULE_PCR_ALLOWLIST`, `RULE_CRYPTO_VERIFICATION_FAILED`, or `RULE_MEASUREMENT_VERIFICATION_FAILED`).
+The deterministic rule floor $\mathcal{R}(\mathbf{x}) = 0$ requires at least one deterministic rule violation (`RULE_SVN_ROLLBACK`, `RULE_PCR_NOT_ALLOWLISTED`, `RULE_STAGE_MISMATCH`, `RULE_CRYPTO_VERIFICATION_FAILED`, or `RULE_MEASUREMENT_VERIFICATION_FAILED`).
 If all deterministic rules pass ($\mathcal{R}(\mathbf{x}) = 1$), then for any arbitrary anomaly score $S_{risk}(\mathbf{x}) \in [0, 1]$, the decision is strictly constrained to $\{\text{PASS}, \text{WARN + REDUCED\_TRUST}\}$.
 Hence, the system cannot be bricked by false-positive statistical outliers. $\blacksquare$
+
+---
+
+### Score Saturation Characteristics (F-18)
+The Isolation Forest detector maps raw path-length anomaly scores to $[0, 1]$ via a logistic sigmoid transformation:
+$$\text{score} = \frac{1}{1 + e^{-12 \cdot (\text{raw} - \text{threshold})}}$$
+Under this parameterization, the score saturates near $\approx 0.69$ for any substantial outlier ($>3\sigma$). Consequently, the detector functions as an indicator of anomaly presence rather than a linear measure of attack magnitude once the decision threshold is exceeded.
 
 ---
 
@@ -56,7 +62,4 @@ Hence, the system cannot be bricked by false-positive statistical outliers. $\bl
 - **Total Test Cases**: 116 passing tests (100% pass rate, mechanically verified via `pytest`).
 - **Code Coverage**: 87% line coverage across all modules (`pytest-cov`).
 - **Benign False HALTs**: 0 (Tested under heavy CPU math load, cold cache, and authorized firmware upgrades).
-- **Held-Out Attack A5**: Successfully detected by Isolation Forest spatial feature analysis without hyperparameter retraining.
-
-
-
+- **Held-Out Attack A5**: Evaluated out-of-sample; foreign memory footprint and allocation patterns trigger spatial anomaly detection without retraining.

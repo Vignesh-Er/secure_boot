@@ -2,7 +2,7 @@
 
 **System**: BootSentry — AI-Assisted Secure Boot & Integrity Verification  
 **Repository**: https://github.com/Vignesh-Er/secure_boot  
-**Release Tag**: `v1.0.0`  
+**Release Tag**: `v1.0.2`  
 **License**: Apache 2.0 / MIT  
 
 ---
@@ -13,39 +13,33 @@
 - **Tests**: 116 passed / 0 failed (100% pass rate across 116 test cases in `tests/`)
 - **Coverage**: 87% line coverage across `src/bootsentry/` (`pytest-cov`)
 - **Ruff Linting**: 0 errors / 0 warnings (`ruff check src/ tests/` with `E,W,F,I,B,BLE,UP,SIM`)
-
-
-
 - **CI Matrix**: GitHub Actions automated pipeline passing on Python 3.10, 3.11, 3.12
-- **Python Versions Supported**: Python 3.10, 3.11, 3.12 (AMD64 & ARM64)
+- **Python Versions Supported**: Python 3.10, 3.11, 3.12 (AMD64 & ARM64 Linux/Windows)
 - **ML-DSA Implementation**: NIST FIPS 204 standardized Module-Lattice-Based Digital Signature Algorithm (`ML-DSA-65` primary, with `ML-DSA-44` and `ML-DSA-87` support)
 - **Gate 1 (PQC Verification)**: Deterministic, fail-closed ML-DSA-65 signature verification over RFC 8785 canonical JSON manifests
 - **Gate 2 (Measured Boot)**: TPM-style software simulation SHA-256 PCR bank (PCR[0..3]), append-only replayable event log, and cryptographically signed PQC attestation quotes
 - **Gate 3 (Behavioral AI Anomaly)**: 3-Layer Behavioral Detector (28-feature Isolation Forest + 1st-Order Markov Chain + EWMA/CUSUM Multi-Boot Drift Monitor) with Robust Median/MAD z-score Feature Attribution Engine
-- **Policy Safety (Invariant 3)**: AI anomaly score produces `WARN + REDUCED_TRUST`; system `HALT` strictly requires a deterministic rule violation (`RULE_SVN_ROLLBACK`, `RULE_PCR_ALLOWLIST`, `RULE_CRYPTO_VERIFICATION_FAILED`, or `RULE_UNKNOWN_EVENT`)
+- **Policy Safety (Invariant 3)**: AI anomaly score produces `WARN + REDUCED_TRUST`; system `HALT` strictly requires a deterministic rule violation (`RULE_SVN_ROLLBACK`, `RULE_PCR_NOT_ALLOWLISTED`, `RULE_CRYPTO_VERIFICATION_FAILED`, or `RULE_STAGE_MISMATCH`)
 - **Attack A1 (Signed Version Downgrade)**: PASS $\to$ Deterministic Rule Floor trips `RULE_SVN_ROLLBACK` $\implies$ `HALT`
-- **Attack A2 (TOCTOU Dynamic Config Swap)**: PASS $\to$ Isolation Forest flags memory & runtime anomalies ($+4.9\sigma$) $\implies$ `WARN + REDUCED_TRUST`
+- **Attack A2 (TOCTOU Dynamic Config Swap)**: PASS $\to$ Isolation Forest flags memory & runtime anomalies $\implies$ `WARN + REDUCED_TRUST`
 - **Attack A3 (Signed Service Sequence Reorder)**: PASS $\to$ 1st-Order Markov Chain flags zero-probability transition $\implies$ `WARN + REDUCED_TRUST`
-- **Attack A4 (Slow-Drip Multi-Boot Drift)**: PASS $\to$ EWMA / CUSUM Monitor detects accumulated positive drift at boot 12 ($>4.0\sigma$) $\implies$ `WARN + REDUCED_TRUST`
+- **Attack A4 (Slow-Drip Multi-Boot Drift)**: PASS $\to$ EWMA / CUSUM Monitor detects accumulated positive drift at boot 5 $\implies$ `WARN + REDUCED_TRUST`
 - **Attack A5 (Cross-SKU Component Substitution)**: PASS $\to$ Strictly held-out out-of-sample component evaluated with frozen baseline; Isolation Forest flags foreign memory allocation footprint $\implies$ `WARN + REDUCED_TRUST`
 - **Benign Controls (B1 Cold Cache, B2 Upgrade, B3 CPU Load)**: PASS $\to$ 0 false HALTs across all environmental variations
-- **PR-AUC**: 1.0000 (Scenario-level multi-gate threat mitigation benchmark) / 0.9699 (Continuous sample-level behavioral detector evaluation)
-- **ROC-AUC**: 1.0000 (Scenario-level multi-gate threat mitigation benchmark) / 0.9563 (Continuous sample-level behavioral detector evaluation)
-- **FPR @ 95% TPR**: 0.0000 (Scenario-level benchmark)
-- **False HALTs**: 0
+- **Scenario-Level Benchmark Metrics**: ROC-AUC = 0.9953, PR-AUC = 0.9667, FPR @ 95% TPR = 0.0233 ($N=48, n_{pos}=5$)
+- **Sample-Level Continuous Metrics**: ROC-AUC = 0.9874, PR-AUC = 0.9820, FPR @ 95% TPR = 0.0698 ($N=68, n_{pos}=25$)
+- **False HALTs on Benign Controls**: 0
 - **Fresh-Clone Verification**: PASSED (Verified via independent clean clone in isolated temporary directory)
 - **Judge-Check Engine**: 14 / 14 automated integrity verification checks passed (`make judge-check`)
 - **Evaluation Forensics & Attribution Audit**: Fully documented in `docs/evaluation-forensics.md` and `eval/forensic/attribution_audit.json`
-- **Known Limitations**: TPM environment is a software-level simulation; timing features are subject to extreme non-uniform host I/O contention; ML-DSA-65 signatures (3,293 bytes) require memory overhead buffering in embedded environments (Documented in `docs/limitations.md`).
-
-
+- **Known Limitations**: TPM environment is a software-level simulation; timing features are subject to host I/O contention; ML-DSA-65 signatures (3,309 bytes) require memory buffering in embedded environments (Documented in `docs/limitations.md`).
 
 ---
 
 ## 2. Reproducibility Commands
 
 ```bash
-# 1. 14-Point Automated Judge Verification
+# 1. Automated Judge Verification
 make judge-check
 
 # 2. Deterministic Safe Demo Replay (8 Scenarios)

@@ -89,33 +89,34 @@ Benchmarked on AMD64 Python 3.12:
 
 | Algorithm | Security Level | Public Key | Private Key | Signature | Keygen Latency | Sign Latency | Verify Latency |
 |---|---|---|---|---|---|---|---|
-| **ML-DSA-44** | NIST Level 2 (AES-128) | 1,312 B | 2,528 B | 2,420 B | 31.4 ms | 52.1 ms | 13.6 ms |
-| **ML-DSA-65 (Default)** | NIST Level 3 (AES-192) | 1,952 B | 4,000 B | 3,293 B | 78.2 ms | 150.0 ms | 20.9 ms |
-| **ML-DSA-87** | NIST Level 5 (AES-256) | 2,592 B | 4,864 B | 4,595 B | 94.6 ms | 136.7 ms | 33.0 ms |
+| **ML-DSA-44** | NIST Level 2 (AES-128) | 1,312 B | 2,560 B | 2,420 B | 31.4 ms | 52.1 ms | 13.6 ms |
+| **ML-DSA-65 (Default)** | NIST Level 3 (AES-192) | 1,952 B | 4,032 B | 3,309 B | 78.2 ms | 150.0 ms | 20.9 ms |
+| **ML-DSA-87** | NIST Level 5 (AES-256) | 2,592 B | 4,896 B | 4,627 B | 94.6 ms | 136.7 ms | 33.0 ms |
 
 ---
 
 ## Attack Matrix & Evaluation Results
 
-Evaluated across 67 test boot cycles, 5 realistic attack scenarios, and 3 benign stress controls:
+Evaluated across test boot cycles, 5 realistic attack scenarios, and 3 benign stress controls:
 
-| Scenario ID | Attack Description | Gate 1 (Crypto) | Gate 2 (PCR) | Gate 3 (AI / Rules) | Policy Verdict | Top Robust-z Attribution |
+| Scenario ID | Attack Description | Gate 1 (Crypto) | Gate 2 (PCR) | Gate 3 (AI / Rules) | Policy Verdict | Top Attribution |
 |---|---|---|---|---|---|---|
-| **A1** | Signed Version Downgrade (SVN=3 < 5) | PASS | PASS | **RULE_SVN_ROLLBACK** | `HALT` | `security_version (-4.2σ)` |
-| **A2** | TOCTOU Dynamic Config Swap | PASS | PASS | **IF Anomaly (Score=0.89)** | `WARN` | `t_exec_s2 (+5.8σ), rss_mb (+4.9σ)` |
-| **A3** | Signed Service Reorder (`svc_e` -> `diag`) | PASS | PASS | **Markov NLL (Score=1.00)** | `WARN` | `unseen_transitions (+5.0σ)` |
-| **A4** | Slow-Drip Drift (20 boots, +4ms/boot) | PASS | PASS | **EWMA / CUSUM (Score=0.92)** | `WARN` | `cusum_drift (+5.4σ)` |
-| **A5** | Cross-SKU Substitution (Held-Out) | PASS | PASS | **IF Anomaly (Score=0.57)** | `WARN` | `rss_s2_mb (+5.2σ)` |
-| **B1** | Benign: Cold Cache Boot | PASS | PASS | Normal Variance (Score=0.40) | `PASS` | `t_total (+1.8σ)` |
-| **B2** | Benign: Authorized Upgrade (SVN=6 > 5) | PASS | PASS | Normal Upgrade (Score=0.34) | `PASS` | `security_version (+1.0σ)` |
-| **B3** | Benign: Host CPU Background Load | PASS | PASS | Normal Variance (Score=0.39) | `PASS` | `stage_time_ratio (+0.4σ)` |
+| **A1** | Signed Version Downgrade (SVN=3 < 5) | PASS | PASS | **RULE_SVN_ROLLBACK** | `HALT` | `security_version` |
+| **A2** | TOCTOU Dynamic Config Swap | PASS | PASS | **IF Anomaly (Score=0.53)** | `WARN` | `io_bytes_read_kb, ctx_switches_vol` |
+| **A3** | Signed Service Reorder (`svc_e` -> `diag`) | PASS | PASS | **Markov NLL (Score=1.00)** | `WARN` | `unseen_transitions` |
+| **A4** | Slow-Drip Drift (20 boots, +4ms/boot) | PASS | PASS | **EWMA / CUSUM (Score=1.00)** | `WARN` | `cusum_drift (Boot 5)` |
+| **A5** | Cross-SKU Substitution (Held-Out) | PASS | PASS | **IF Anomaly (Score=0.60)** | `WARN` | `rss_s2_mb, io_bytes_read_kb` |
+| **B1** | Benign: Cold Cache Boot | PASS | PASS | Normal Variance (Score=0.41) | `PASS` | `t_total` |
+| **B2** | Benign: Authorized Upgrade (SVN=6 > 5) | PASS | PASS | Normal Upgrade (Score=0.36) | `PASS` | `security_version` |
+| **B3** | Benign: Host CPU Background Load | PASS | PASS | Normal Variance (Score=0.38) | `PASS` | `stage_time_ratio` |
 
 ### Quantitative Metrics (Single Source of Truth: `eval/project_metrics.json`)
-- **Multi-Gate System Threat Mitigation (Scenario-Level)**: **100% Threat Separation** (Scenario-Level Benchmark: `ROC-AUC = 1.0000`, `PR-AUC = 1.0000`, `FPR @ 95% TPR = 0.0000` — Evaluates full multi-gate defense combining deterministic cryptographic rules + behavioral detectors across reference attack fixtures)
-- **Continuous Behavioral ML Detector (Sample-Level Evaluation)**: **Sample-Level ROC-AUC = 0.9563**, **PR-AUC = 0.9699** (Evaluates continuous sample-level behavioral ML performance across sequential executions without deterministic rule floor)
-- **Benign False HALTs**: **0** (Verified 0 false halts across cold cache, legitimate upgrades, and CPU load)
-- **Held-Out A5 Evaluation**: **WARN + REDUCED_TRUST** (Evaluated strictly out-of-sample; calibrated cross-SKU memory/I/O profile anomaly with top robust-z: `io_read_write_ratio` $+32000.0\sigma$, `io_bytes_read_kb` $+32.0\sigma$, `rss_s2_mb` $+31.3\sigma$)
-- **Test Suite Coverage**: **87%** (116 tests passing / 0 failures)
+- **Multi-Gate System Threat Mitigation (Scenario-Level Benchmark)**: `ROC-AUC = 0.9953`, `PR-AUC = 0.9667`, `FPR @ 95% TPR = 0.0233` ($N=48, n_{pos}=5, n_{neg}=43$) — Evaluates complete multi-gate defense combining deterministic cryptographic rules + behavioral detectors across reference attack fixtures.
+- **Continuous Behavioral ML Detector (Sample-Level Evaluation)**: `ROC-AUC = 0.9874`, `PR-AUC = 0.9820`, `FPR @ 95% TPR = 0.0698` ($N=68, n_{pos}=25, n_{neg}=43$) — Evaluates continuous sample-level behavioral ML performance across sequential executions without deterministic rule floor.
+- **Clean False Warning Rate**: `0.0500` (2/40 held-out clean boots score $\ge 0.5$).
+- **Benign False HALTs**: `0` (Verified 0 false halts across cold cache, legitimate upgrades, and CPU load).
+- **Held-Out A5 Evaluation**: `WARN + REDUCED_TRUST` (Evaluated strictly out-of-sample on foreign component footprint).
+- **Test Suite Coverage**: `87%` (116 tests passing / 0 failures).
 - **Forensic Audit Reports**: See [evaluation-forensics.md](docs/evaluation-forensics.md) and [attribution_audit.json](eval/forensic/attribution_audit.json).
 
 

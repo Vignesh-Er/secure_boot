@@ -6,13 +6,24 @@
   "test_failures": 0,
   "coverage_percent": 87,
   "ruff_errors": 0,
-  "pr_auc": 1.0,
-  "roc_auc": 1.0,
-  "fpr_at_tpr95": 0.0,
+  "scenario_level_metrics": {
+    "roc_auc": 0.9953,
+    "pr_auc": 0.9667,
+    "fpr_at_tpr95": 0.0233,
+    "n_pos": 5,
+    "n_neg": 43
+  },
+  "sample_level_metrics": {
+    "roc_auc": 0.9874,
+    "pr_auc": 0.9820,
+    "fpr_at_tpr95": 0.0698,
+    "n_pos": 25,
+    "n_neg": 43
+  },
+  "clean_false_warn_rate": 0.05,
   "benign_false_halts": 0,
   "a5_held_out": true,
   "security_invariants_verified": 8,
-  "git_commit": "7e609a7122f7f9b28e1c513e221ce886fd566f2a",
   "python_version": "3.12.10",
   "platform": "Windows-11-10.0.26200-SP0"
 }
