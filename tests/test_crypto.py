@@ -286,7 +286,7 @@ class TestKeyStorageAndBenchmarks:
         res = benchmark_algorithm("ML-DSA-65", iterations=2)
         assert res.algorithm == "ML-DSA-65"
         assert res.public_key_bytes == 1952
-        assert res.signature_bytes == 3293
+        assert res.signature_bytes == 3309
         assert res.sign_ms_mean > 0.0
         assert res.verify_ms_mean > 0.0
 
