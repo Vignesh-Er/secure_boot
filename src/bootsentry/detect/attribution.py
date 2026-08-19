@@ -22,10 +22,13 @@ class FeatureAttribution:
     observed_value: float
     baseline_median: float
     baseline_mad: float
-    robust_z: float  # (observed - median) / (1.4826 * MAD + eps)
+    robust_z: float  # (observed - median) / (scale + eps)
+    scale_source: str = "mad"  # "mad", "l1", "std", or "degenerate"
 
     @property
     def formatted_sigma(self) -> str:
+        if self.scale_source == "degenerate":
+            return f"{self.observed_value:.3g} vs baseline {self.baseline_median:.3g} (no dispersion in baseline)"
         sign = "+" if self.robust_z >= 0 else ""
         return f"{sign}{self.robust_z:.1f}sigma"
 
@@ -36,6 +39,7 @@ class FeatureAttribution:
             "baseline_median": self.baseline_median,
             "baseline_mad": self.baseline_mad,
             "robust_z": self.robust_z,
+            "scale_source": self.scale_source,
             "formatted_sigma": self.formatted_sigma,
         }
 
@@ -47,6 +51,7 @@ class AttributionEngine:
         self.medians: dict[str, float] = {}
         self.mads: dict[str, float] = {}
         self.scales: dict[str, float] = {}
+        self.scale_sources: dict[str, str] = {}
 
     def fit(self, records: list[BootRecord]) -> AttributionEngine:
         """Calculate median, MAD, and robust dispersion scale for all 28 continuous features."""
@@ -61,15 +66,23 @@ class AttributionEngine:
             if mad > 1e-6:
                 # Standard normal-consistent MAD scale
                 scale = 1.4826 * mad
+                source = "mad"
             else:
                 # When MAD == 0 (>50% identical values), fallback to L1 mean absolute deviation
                 l1_dev = float(np.mean(np.abs(col - med)))
                 if l1_dev > 1e-6:
                     scale = 1.2533 * l1_dev
+                    source = "l1"
                 else:
                     std = float(np.std(col))
-                    scale = std if std > 1e-6 else max(1.0, abs(med) * 0.1)
+                    if std > 1e-6:
+                        scale = std
+                        source = "std"
+                    else:
+                        scale = max(1.0, abs(med) * 0.1)
+                        source = "degenerate"
             self.scales[name] = scale
+            self.scale_sources[name] = source
         return self
 
     def explain(self, record: BootRecord, top_k: int = 3) -> list[FeatureAttribution]:
@@ -82,6 +95,7 @@ class AttributionEngine:
             med = self.medians.get(name, 0.0)
             mad = self.mads.get(name, 0.0)
             scale = self.scales.get(name, 1.4826 * mad if mad > 1e-6 else max(1.0, abs(med) * 0.1))
+            source = self.scale_sources.get(name, "mad")
 
             # Numerical safety checks
             if not np.isfinite(obs) or abs(obs - med) < 1e-12:
@@ -91,7 +105,6 @@ class AttributionEngine:
                 if not np.isfinite(z):
                     z = 0.0
 
-
             attributions.append(
                 FeatureAttribution(
                     feature_name=name,
@@ -99,6 +112,7 @@ class AttributionEngine:
                     baseline_median=med,
                     baseline_mad=mad,
                     robust_z=float(z),
+                    scale_source=source,
                 )
             )
 
@@ -113,6 +127,7 @@ class AttributionEngine:
             "medians": self.medians,
             "mads": self.mads,
             "scales": self.scales,
+            "scale_sources": self.scale_sources,
         }
         joblib.dump(bundle, path)
 
@@ -127,10 +142,15 @@ class AttributionEngine:
         engine.medians = bundle.get("medians", {})
         engine.mads = bundle.get("mads", {})
         engine.scales = bundle.get("scales", {})
-        # Backwards compatibility if scales was not previously serialized
-        if not engine.scales:
+        engine.scale_sources = bundle.get("scale_sources", {})
+        # Backwards compatibility if scale_sources was not previously serialized
+        if not engine.scales or not engine.scale_sources:
             for name, mad in engine.mads.items():
                 med = engine.medians.get(name, 0.0)
-                engine.scales[name] = 1.4826 * mad if mad > 1e-6 else max(1.0, abs(med) * 0.1)
+                if mad > 1e-6:
+                    engine.scales[name] = 1.4826 * mad
+                    engine.scale_sources[name] = "mad"
+                else:
+                    engine.scales[name] = max(1.0, abs(med) * 0.1)
+                    engine.scale_sources[name] = "degenerate"
         return engine
-

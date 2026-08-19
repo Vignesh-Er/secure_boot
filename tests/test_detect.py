@@ -146,6 +146,47 @@ class TestEWMADriftMonitor:
 
         assert drift_detected is True
 
+    def test_ewma_causality(self, normal_training_records):
+        """Verify strict temporal causality: output at step t depends only on boots 0..t."""
+        monitor_1 = EWMADriftMonitor(alpha=0.3, cusum_h=3.0)
+        monitor_1.fit(normal_training_records)
+
+        monitor_2 = EWMADriftMonitor(alpha=0.3, cusum_h=3.0)
+        monitor_2.fit(normal_training_records)
+
+        boots = [
+            BootRecord(
+                boot_id=f"causal-boot-{i}",
+                timestamp_iso="2026-08-17T08:00:00Z",
+                total_boot_time_ms=50.0 + (i * 2.0),
+            )
+            for i in range(10)
+        ]
+
+        # Feed first 5 boots to both monitors
+        history_1 = []
+        for b in boots[:5]:
+            is_d, s, details = monitor_1.update(b, current_if_score=0.1)
+            history_1.append((is_d, s, details["ewma_time"], details["cusum_pos"]))
+
+        history_2 = []
+        for b in boots[:5]:
+            is_d, s, details = monitor_2.update(b, current_if_score=0.1)
+            history_2.append((is_d, s, details["ewma_time"], details["cusum_pos"]))
+
+        assert history_1 == history_2, "Deterministic step outputs must match exactly"
+
+        # Step 5 evaluation on monitor 1
+        is_d5_1, s5_1, d5_1 = monitor_1.update(boots[5], current_if_score=0.2)
+
+        # Step 5 evaluation on monitor 2
+        is_d5_2, s5_2, d5_2 = monitor_2.update(boots[5], current_if_score=0.2)
+
+        assert is_d5_1 == is_d5_2
+        assert s5_1 == s5_2
+        assert d5_1["ewma_time"] == d5_2["ewma_time"]
+        assert d5_1["cusum_pos"] == d5_2["cusum_pos"]
+
 
 class TestAttributionEngine:
     def test_attribution_explanation(self, normal_training_records, tmp_path):

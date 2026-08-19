@@ -81,10 +81,24 @@ Measured on local test host (Windows 11 AMD64, Python 3.12.10) via `bootsentry.e
 
 ## 3. Metric Impact Summary
 
-*(To be finalized upon completion of Phase 4 and Phase 6 evaluation runs)*
+### Pre- vs Post-Remediation Measured Metrics
+
+| Metric Dimension | Pre-Remediation Baseline (`eval/baseline_before/`) | Post-Remediation Measured (`eval/metrics.json`) | Status / Rationale |
+|---|---|---|---|
+| **Normal Dataset Size** | 200 boots (160 train / 40 test) | **500 boots (400 train / 100 test)** | 2.5x larger dataset with real OS process execution variance |
+| **Scenario ROC-AUC** | 0.9953 ($N=48, n_{pos}=5, n_{neg}=43$) | **0.9961 ($N=108, n_{pos}=5, n_{neg}=103$)** | Evaluates complete multi-gate defense across all attack threat models |
+| **Scenario PR-AUC** | 0.9667 ($N=48, n_{pos}=5, n_{neg}=43$) | **0.9429 ($N=108, n_{pos}=5, n_{neg}=103$)** | Honest evaluation with 100 held-out clean boots |
+| **Scenario FPR @ 95% TPR**| 0.0233 | **0.0194** | 1.94% false positive rate at 95% true positive rate |
+| **Sample-Level ROC-AUC** | 0.9874 ($N=68, n_{pos}=25, n_{neg}=43$) | **0.8236 ($N=127, n_{pos}=24, n_{neg}=103$)** | Continuous sample-level ML evaluation across multi-boot drift |
+| **Sample-Level PR-AUC** | 0.9820 ($N=68, n_{pos}=25, n_{neg}=43$) | **0.8226 ($N=127, n_{pos}=24, n_{neg}=103$)** | Sub-threshold boots in A4 sequence evaluated without artificial inflation |
+| **Clean False Warn Rate** | 0.0500 (2/40) | **0.0500 (5/100)** | Exactly matches theoretical Isolation Forest contamination parameter |
+| **Benign False HALTs** | 0 | **0** | Invariant 3 maintained (0 false bricking across all stress controls) |
+| **PQC Signature Scheme** | Pre-standardization Dilithium3 (3293B) | **Standardized NIST FIPS 204 ML-DSA-65 (3309B)** | Verified against FIPS 204 specifications |
 
 ---
 
-## 4. Open Assumptions
+## 4. Open Assumptions & Disclosures
 
-*(Documented as remediation proceeds)*
+1. **Inter-Stage Handoff Authentication**: The HMAC-SHA256 key (`BOOTSENTRY_BOOT_SECRET`) provides tamper evidence within the runtime framework domain; production mapping is a TPM-sealed or hardware-rooted key.
+2. **Model Loading Guarantee (G5)**: Manifest signature check (`verify_model_manifest`) validates model file SHA-256 hashes against a pinned public key before any `joblib.load()` call.
+3. **PQC Side-Channel Notice (G2)**: Pure-Python `dilithium-py` reference implementation is educational and not hardened against side-channel or fault attacks.

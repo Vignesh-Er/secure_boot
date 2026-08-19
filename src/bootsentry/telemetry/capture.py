@@ -54,8 +54,10 @@ class ProcessTelemetrySampler:
         try:
             mem = self.process.memory_info()
             self._mem_t0 = mem.rss / (1024.0 * 1024.0)
+            self._faults_t0 = getattr(mem, "num_page_faults", 0)
         except (psutil.Error, OSError, AttributeError, ValueError):
             self._mem_t0 = 0.0
+            self._faults_t0 = 0
 
     def stop(
         self,
@@ -101,11 +103,11 @@ class ProcessTelemetrySampler:
             try:
                 mem_t1 = self.process.memory_info()
                 rss_mb = mem_t1.rss / (1024.0 * 1024.0)
-                # Check page fault counters if available on platform
+                # Calculate delta page faults from stage start
                 if hasattr(mem_t1, "num_page_faults"):
-                    minor_faults = getattr(mem_t1, "num_page_faults", 0)
+                    minor_faults = max(0, getattr(mem_t1, "num_page_faults", 0) - getattr(self, "_faults_t0", 0))
                 elif hasattr(mem_t1, "major_page_faults"):
-                    major_faults = getattr(mem_t1, "major_page_faults", 0)
+                    major_faults = max(0, getattr(mem_t1, "major_page_faults", 0) - getattr(self, "_faults_t0", 0))
             except (psutil.Error, OSError, AttributeError, ValueError):
                 pass
 
