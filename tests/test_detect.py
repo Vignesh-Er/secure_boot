@@ -68,19 +68,7 @@ class TestIsolationForestDetector:
         loaded = IsolationForestDetector.load(model_file)
         assert loaded.score_record(normal_test) == pytest.approx(score_normal, rel=1e-3)
 
-    def test_export_c_code(self, normal_training_records, tmp_path):
-        """Verify C99 decision tree code generator outputs valid C syntax with real tree paths."""
-        detector = IsolationForestDetector(n_estimators=10, random_state=42)
-        detector.fit(normal_training_records)
-        c_file = tmp_path / "generated_trees.c"
-        detector.export_c_code(c_file)
-        assert c_file.exists()
-        content = c_file.read_text(encoding="utf-8")
-        assert "bootsentry_evaluate_isolation_forest" in content
-        assert "evaluate_tree_0" in content
-        assert "SCALER_MEANS" in content
-        assert "SCALER_SCALES" in content
-        assert "return" in content
+
 
 
 class TestMarkovSequenceDetector:

@@ -67,13 +67,7 @@ def train_all_models(
     attr_file = models_path / "attribution_engine.joblib"
     attribution_engine.save(attr_file)
 
-    # 5. Export Transpiled C Decision Trees (if c_src exists)
-    c_trees_file = Path("c_src/src/generated_trees.c")
-    if c_trees_file.parent.exists():
-        if_detector.export_c_code(c_trees_file)
-        print(f"  [+] Transpiled C99 decision trees exported to {c_trees_file}")
-
-    # 6. Generate and Sign Cryptographic Model Manifest (Gate 1 PQC Sealing)
+    # 5. Generate and Sign Cryptographic Model Manifest (Gate 1 PQC Sealing)
     from bootsentry.crypto.keys import load_public_key, load_secret_key
     from bootsentry.crypto.model_manifest import create_model_manifest, sign_model_manifest
 
