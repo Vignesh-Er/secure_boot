@@ -56,6 +56,10 @@ def initialize_default_environment(
     keys_dir.mkdir(parents=True, exist_ok=True)
     stages_dir.mkdir(parents=True, exist_ok=True)
 
+    import os
+    if "BOOTSENTRY_BOOT_SECRET" not in os.environ:
+        os.environ["BOOTSENTRY_BOOT_SECRET"] = os.urandom(32).hex()
+
     # Copy canonical keys and stages if available to avoid key drift
     if base != Path("."):
         import shutil

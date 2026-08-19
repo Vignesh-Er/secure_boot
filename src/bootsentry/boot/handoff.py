@@ -67,9 +67,12 @@ class BootHandoff:
 
         data = self.to_dict()
         effective_secret = secret or os.environ.get("BOOTSENTRY_BOOT_SECRET")
-        if effective_secret:
-            data["mac"] = compute_handoff_mac(data, effective_secret)
-            self.mac = data["mac"]
+        if not effective_secret:
+            effective_secret = os.urandom(32).hex()
+            os.environ["BOOTSENTRY_BOOT_SECRET"] = effective_secret
+
+        data["mac"] = compute_handoff_mac(data, effective_secret)
+        self.mac = data["mac"]
 
         temp_path = path.with_suffix(".tmp")
         with open(temp_path, "w", encoding="utf-8") as f:
@@ -91,7 +94,12 @@ class BootHandoff:
             data = json.load(f)
 
         effective_secret = secret or os.environ.get("BOOTSENTRY_BOOT_SECRET")
-        if verify_mac and effective_secret:
+        if verify_mac:
+            if not effective_secret:
+                raise BootHandoffSecurityError(
+                    "BOOTSENTRY_BOOT_SECRET is not provisioned in environment or parameters; "
+                    "cannot authenticate handoff token (fail-closed)"
+                )
             token_mac = data.get("mac")
             if not token_mac:
                 raise BootHandoffSecurityError("Inter-stage handoff token is missing required HMAC signature (F-02)")

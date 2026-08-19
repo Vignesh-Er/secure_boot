@@ -7,7 +7,7 @@ import sys
 import time
 from pathlib import Path
 
-from bootsentry.boot.handoff import BootHandoff
+from bootsentry.boot.handoff import BootHandoff, BootHandoffSecurityError
 from bootsentry.boot.services import DEFAULT_SERVICE_SEQUENCE, SERVICE_REGISTRY
 from bootsentry.crypto.keys import load_secret_key
 from bootsentry.crypto.provider import CryptoError, VerificationError
@@ -33,8 +33,21 @@ def run_stage_3(
     keys_path = Path(keys_dir)
     run_path = Path(run_dir)
 
+    try:
+        handoff = BootHandoff.load(handoff_path)
+    except (BootHandoffSecurityError, FileNotFoundError, Exception) as e:
+        h = BootHandoff(
+            boot_id="unknown",
+            current_stage="S3",
+            next_stage="DONE",
+            pcr_state={},
+            event_log_data=[],
+            status="HALTED",
+            error_message=f"Inter-stage handoff security verification failed in S3: {e}",
+        )
+        h.save(run_path / "handoff_s3.json")
+        return h
 
-    handoff = BootHandoff.load(handoff_path)
     if handoff.status == "HALTED":
         return handoff
 

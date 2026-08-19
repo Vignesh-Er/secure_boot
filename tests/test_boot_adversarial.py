@@ -156,6 +156,23 @@ class TestHandoffMACSecurity:
         with pytest.raises(BootHandoffSecurityError):
             BootHandoff.load(h_file, secret=secret_boot_2)
 
+    def test_6_missing_boot_secret_fails_closed(self, tmp_path, monkeypatch):
+        """When BOOTSENTRY_BOOT_SECRET is missing and no secret passed, load() fails closed."""
+        monkeypatch.delenv("BOOTSENTRY_BOOT_SECRET", raising=False)
+        h = BootHandoff(
+            boot_id="b1",
+            current_stage="S0",
+            next_stage="S1",
+            pcr_state={"PCR0": "00" * 32},
+            event_log_data=[],
+        )
+        h_file = tmp_path / "handoff.json"
+        h.save(h_file, secret=os.urandom(32))
+
+        # Loading without any secret in env or args must fail closed
+        with pytest.raises(BootHandoffSecurityError, match="BOOTSENTRY_BOOT_SECRET is not provisioned"):
+            BootHandoff.load(h_file, secret=None, verify_mac=True)
+
 
 class TestSVNFloorSecurity:
     """Tests 6-9: Security Version Counter (SVN) Floor Enforcement (F-03)."""

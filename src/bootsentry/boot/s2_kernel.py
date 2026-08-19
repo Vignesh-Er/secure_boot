@@ -5,12 +5,13 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import time
 from pathlib import Path
 
-from bootsentry.boot.handoff import BootHandoff
+from bootsentry.boot.handoff import BootHandoff, BootHandoffSecurityError
 from bootsentry.crypto.keys import load_public_key
 from bootsentry.crypto.manifest import Manifest
 from bootsentry.crypto.provider import CryptoError, MalformedKeyError
@@ -38,7 +39,21 @@ def run_stage_2(
     stages_path = Path(stages_dir)
     run_path = Path(run_dir)
 
-    handoff = BootHandoff.load(handoff_path)
+    try:
+        handoff = BootHandoff.load(handoff_path)
+    except (BootHandoffSecurityError, FileNotFoundError, json.JSONDecodeError) as e:
+        h = BootHandoff(
+            boot_id="unknown",
+            current_stage="S2",
+            next_stage="DONE",
+            pcr_state={},
+            event_log_data=[],
+            status="HALTED",
+            error_message=f"Inter-stage handoff security verification failed in S2: {e}",
+        )
+        h.save(run_path / "handoff_s2.json")
+        return h
+
     if handoff.status == "HALTED":
         return handoff
 
@@ -167,7 +182,7 @@ def run_stage_2(
             str(run_path),
         ]
         try:
-            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=30, env=os.environ.copy())
             if proc.returncode != 0:
                 handoff.status = "HALTED"
                 handoff.error_message = f"S3 process exited with code {proc.returncode}: {proc.stderr}"

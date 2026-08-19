@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import subprocess
 import sys
 import time
@@ -41,6 +42,9 @@ def run_stage_0(
     stages_path = Path(stages_dir)
     run_path = Path(run_dir)
     run_path.mkdir(parents=True, exist_ok=True)
+
+    if "BOOTSENTRY_BOOT_SECRET" not in os.environ:
+        os.environ["BOOTSENTRY_BOOT_SECRET"] = os.urandom(32).hex()
 
     pcr_bank = PcrBank()
     event_log = EventLog()
@@ -174,7 +178,7 @@ def run_stage_0(
             str(run_path),
         ]
         try:
-            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=30, env=os.environ.copy())
             if proc.returncode != 0:
                 handoff.status = "HALTED"
                 handoff.error_message = f"S1 process exited with code {proc.returncode}: {proc.stderr}"

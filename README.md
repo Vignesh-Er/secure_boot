@@ -116,7 +116,7 @@ Evaluated across 500 real boot cycles (400 train / 100 test), 5 realistic attack
 - **Clean False Warning Rate**: `0.0500` (5/100 held-out clean boots score $\ge 0.5$).
 - **Benign False HALTs**: `0` (Verified 0 false halts across cold cache, legitimate upgrades, and CPU load).
 - **Held-Out A5 Evaluation**: `WARN + REDUCED_TRUST` (Evaluated strictly out-of-sample on foreign component footprint).
-- **Test Suite Coverage**: `85%` (154 tests passing / 0 failures).
+- **Test Suite Coverage**: `85%` (155 tests passing / 0 failures).
 - **Forensic Audit Reports**: See [evaluation-forensics.md](docs/evaluation-forensics.md) and [AUDIT_RESPONSE.md](AUDIT_RESPONSE.md).
 
 
