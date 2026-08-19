@@ -98,7 +98,6 @@ def train_all_models(
         "markov": markov_file,
         "ewma": ewma_file,
         "attribution": attr_file,
-        "c_trees": c_trees_file,
         "model_manifest": manifest_file,
     }
 

@@ -1,0 +1,10 @@
+{
+  "A1": ["HALT"],
+  "A2": ["WARN", "WARN + REDUCED_TRUST", "WARN + ATTEST"],
+  "A3": ["WARN", "WARN + REDUCED_TRUST", "WARN + ATTEST"],
+  "A4": ["WARN", "WARN + REDUCED_TRUST", "WARN + ATTEST"],
+  "A5": ["WARN", "WARN + REDUCED_TRUST", "WARN + ATTEST"],
+  "B1": ["PASS"],
+  "B2": ["PASS"],
+  "B3": ["PASS"]
+}

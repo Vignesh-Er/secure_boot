@@ -3,7 +3,7 @@
 [![CI](https://github.com/Vignesh-Er/secure_boot/actions/workflows/ci.yml/badge.svg)](https://github.com/Vignesh-Er/secure_boot/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Coverage: 87%](https://img.shields.io/badge/coverage-87%25-brightgreen.svg)](eval/report.html)
+[![Coverage: 85%](https://img.shields.io/badge/coverage-85%25-brightgreen.svg)](eval/report.html)
 [![PQC: ML--DSA--65](https://img.shields.io/badge/PQC-NIST_FIPS_204_(ML--DSA--65)-purple.svg)](docs/crypto-benchmarks.md)
 
 
@@ -97,27 +97,27 @@ Benchmarked on AMD64 Python 3.12:
 
 ## Attack Matrix & Evaluation Results
 
-Evaluated across test boot cycles, 5 realistic attack scenarios, and 3 benign stress controls:
+Evaluated across 500 real boot cycles (400 train / 100 test), 5 realistic attack scenarios, and 3 benign stress controls:
 
 | Scenario ID | Attack Description | Gate 1 (Crypto) | Gate 2 (PCR) | Gate 3 (AI / Rules) | Policy Verdict | Top Attribution |
 |---|---|---|---|---|---|---|
 | **A1** | Signed Version Downgrade (SVN=3 < 5) | PASS | PASS | **RULE_SVN_ROLLBACK** | `HALT` | `security_version` |
-| **A2** | TOCTOU Dynamic Config Swap | PASS | PASS | **IF Anomaly (Score=0.53)** | `WARN` | `io_bytes_read_kb, ctx_switches_vol` |
-| **A3** | Signed Service Reorder (`svc_e` -> `diag`) | PASS | PASS | **Markov NLL (Score=1.00)** | `WARN` | `unseen_transitions` |
-| **A4** | Slow-Drip Drift (20 boots, +4ms/boot) | PASS | PASS | **EWMA / CUSUM (Score=1.00)** | `WARN` | `cusum_drift (Boot 5)` |
-| **A5** | Cross-SKU Substitution (Held-Out) | PASS | PASS | **IF Anomaly (Score=0.60)** | `WARN` | `rss_s2_mb, io_bytes_read_kb` |
-| **B1** | Benign: Cold Cache Boot | PASS | PASS | Normal Variance (Score=0.41) | `PASS` | `t_total` |
-| **B2** | Benign: Authorized Upgrade (SVN=6 > 5) | PASS | PASS | Normal Upgrade (Score=0.36) | `PASS` | `security_version` |
-| **B3** | Benign: Host CPU Background Load | PASS | PASS | Normal Variance (Score=0.38) | `PASS` | `stage_time_ratio` |
+| **A2** | TOCTOU Dynamic Config Swap | PASS | PASS | **IF Anomaly (Score=0.79)** | `WARN` | `io_bytes_read_kb` |
+| **A3** | Signed Service Reorder (`svc_e` -> `svc_a`) | PASS | PASS | **Markov NLL (Score=1.00)** | `WARN` | `unseen_transitions` |
+| **A4** | Slow-Drip Drift (20 boots, +4ms/boot) | PASS | PASS | **EWMA / CUSUM (Score=1.00)** | `WARN + ATTEST` | `cusum_drift (Boot 5)` |
+| **A5** | Cross-SKU Substitution (Held-Out) | PASS | PASS | **IF Anomaly (Score=0.89)** | `WARN` | `rss_s2_mb` |
+| **B1** | Benign: Cold Cache Boot | PASS | PASS | Normal Variance | `PASS` | `t_total` |
+| **B2** | Benign: Authorized Upgrade (SVN=6 > 5) | PASS | PASS | Normal Upgrade | `PASS` | `security_version` |
+| **B3** | Benign: Host CPU Background Load | PASS | PASS | Normal Variance | `PASS` | `stage_time_ratio` |
 
 ### Quantitative Metrics (Single Source of Truth: `eval/project_metrics.json`)
-- **Multi-Gate System Threat Mitigation (Scenario-Level Benchmark)**: `ROC-AUC = 0.9953`, `PR-AUC = 0.9667`, `FPR @ 95% TPR = 0.0233` ($N=48, n_{pos}=5, n_{neg}=43$) — Evaluates complete multi-gate defense combining deterministic cryptographic rules + behavioral detectors across reference attack fixtures.
-- **Continuous Behavioral ML Detector (Sample-Level Evaluation)**: `ROC-AUC = 0.9874`, `PR-AUC = 0.9820`, `FPR @ 95% TPR = 0.0698` ($N=68, n_{pos}=25, n_{neg}=43$) — Evaluates continuous sample-level behavioral ML performance across sequential executions without deterministic rule floor.
-- **Clean False Warning Rate**: `0.0500` (2/40 held-out clean boots score $\ge 0.5$).
+- **Multi-Gate System Threat Mitigation (Scenario-Level Benchmark)**: `ROC-AUC = 0.9961`, `PR-AUC = 0.9429`, `FPR @ 95% TPR = 0.0194` ($N=108, n_{pos}=5, n_{neg}=103$) — Evaluates complete multi-gate defense combining deterministic cryptographic rules + behavioral detectors across reference attack fixtures.
+- **Continuous Behavioral ML Detector (Sample-Level Evaluation)**: `ROC-AUC = 0.8236`, `PR-AUC = 0.8226`, `FPR @ 95% TPR = 1.0` ($N=127, n_{pos}=24, n_{neg}=103$) — Evaluates continuous sample-level behavioral ML performance across sequential executions without deterministic rule floor.
+- **Clean False Warning Rate**: `0.0500` (5/100 held-out clean boots score $\ge 0.5$).
 - **Benign False HALTs**: `0` (Verified 0 false halts across cold cache, legitimate upgrades, and CPU load).
 - **Held-Out A5 Evaluation**: `WARN + REDUCED_TRUST` (Evaluated strictly out-of-sample on foreign component footprint).
-- **Test Suite Coverage**: `87%` (116 tests passing / 0 failures).
-- **Forensic Audit Reports**: See [evaluation-forensics.md](docs/evaluation-forensics.md) and [attribution_audit.json](eval/forensic/attribution_audit.json).
+- **Test Suite Coverage**: `85%` (154 tests passing / 0 failures).
+- **Forensic Audit Reports**: See [evaluation-forensics.md](docs/evaluation-forensics.md) and [AUDIT_RESPONSE.md](AUDIT_RESPONSE.md).
 
 
 ---

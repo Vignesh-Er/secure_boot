@@ -6,8 +6,8 @@ AI / ML anomaly scores never override or weaken these rules.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 import json
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -30,7 +30,7 @@ def load_default_svn_floor(config_path: Path | str = "config/svn_floor.json") ->
             with open(p, encoding="utf-8") as f:
                 data = json.load(f)
             return data.get("min_svn", {})
-        except Exception:
+        except (json.JSONDecodeError, OSError, ValueError):
             pass
     return {"S1": 1, "S2": 5, "S3": 1}
 
@@ -43,7 +43,7 @@ def load_default_pcr_allowlist(config_path: Path | str = "config/pcr_allowlist.j
             with open(p, encoding="utf-8") as f:
                 data = json.load(f)
             return set(data.get("allowlisted_composites", []))
-        except Exception:
+        except (json.JSONDecodeError, OSError, ValueError):
             pass
     return set()
 

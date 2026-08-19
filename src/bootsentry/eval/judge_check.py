@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import platform
 import subprocess
 import sys
@@ -164,18 +165,29 @@ def run_judge_check() -> int:
         overall_passed = False
 
     # 9. Attack Testbed (A1-A4)
-    console.print("[*] Verifying Attack Scenarios A1-A4...")
+    console.print("[*] Verifying Attack Scenarios A1-A4 against expected verdicts...")
     try:
+        expected_file = Path("eval/expected_verdicts.json")
+        expected: dict[str, Any] = {}
+        if expected_file.exists():
+            with open(expected_file, encoding="utf-8") as f:
+                expected = json.load(f)
+
         attack_results = run_attack_testbed(base_dir=".")
         a1 = next((r for r in attack_results if "A1" in r["scenario"]), None)
         a2 = next((r for r in attack_results if "A2" in r["scenario"]), None)
         a3 = next((r for r in attack_results if "A3" in r["scenario"]), None)
         a4 = next((r for r in attack_results if "A4" in r["scenario"]), None)
 
-        if a1 and a1["verdict"] == "HALT" and a2 and a3 and a4:
-            results.append({"check": "Attacks A1-A4", "detail": "A1: HALT, A2-A4: WARN + REDUCED_TRUST", "status": "PASS"})
+        v1_ok = a1 and a1["verdict"] in expected.get("A1", ["HALT"])
+        v2_ok = a2 and a2["verdict"] in expected.get("A2", ["WARN", "WARN + REDUCED_TRUST", "WARN + ATTEST"])
+        v3_ok = a3 and a3["verdict"] in expected.get("A3", ["WARN", "WARN + REDUCED_TRUST", "WARN + ATTEST"])
+        v4_ok = a4 and a4["verdict"] in expected.get("A4", ["WARN", "WARN + REDUCED_TRUST", "WARN + ATTEST"])
+
+        if v1_ok and v2_ok and v3_ok and v4_ok:
+            results.append({"check": "Attacks A1-A4", "detail": "A1: HALT, A2-A4: WARN (Dynamic Match)", "status": "PASS"})
         else:
-            results.append({"check": "Attacks A1-A4", "detail": "Attack detection mismatch", "status": "FAIL"})
+            results.append({"check": "Attacks A1-A4", "detail": "Attack detection mismatch against expected", "status": "FAIL"})
             overall_passed = False
     except (CryptoError, OSError, ValueError) as e:
         results.append({"check": "Attacks A1-A4", "detail": str(e), "status": "FAIL"})
@@ -185,7 +197,8 @@ def run_judge_check() -> int:
     console.print("[*] Verifying Held-Out Attack A5 (Cross-SKU)...")
     try:
         a5 = next((r for r in attack_results if "A5" in r["scenario"]), None)
-        if a5 and a5["verdict"] in ["WARN", "WARN + ATTEST"]:
+        v5_ok = a5 and a5["verdict"] in expected.get("A5", ["WARN", "WARN + ATTEST", "WARN + REDUCED_TRUST"])
+        if v5_ok:
             results.append({"check": "Attack A5 (Held-Out)", "detail": "Strictly Held-Out & Flagged Anomaly", "status": "PASS"})
         else:
             results.append({"check": "Attack A5 (Held-Out)", "detail": "A5 execution failure", "status": "FAIL"})
@@ -214,7 +227,10 @@ def run_judge_check() -> int:
     metrics_file = Path("eval/metrics.json")
     report_file = Path("eval/report.html")
     if metrics_file.exists() and report_file.exists():
-        results.append({"check": "Evaluation Artifacts", "detail": f"ROC-AUC={evidence.get('roc_auc')} PR-AUC={evidence.get('pr_auc')}", "status": "PASS"})
+        scen_metrics = evidence.get("scenario_level_metrics", {})
+        scen_roc = scen_metrics.get("roc_auc", evidence.get("roc_auc", "N/A"))
+        scen_pr = scen_metrics.get("pr_auc", evidence.get("pr_auc", "N/A"))
+        results.append({"check": "Evaluation Artifacts", "detail": f"ROC-AUC={scen_roc} PR-AUC={scen_pr}", "status": "PASS"})
     else:
         results.append({"check": "Evaluation Artifacts", "detail": "Missing report.html or metrics.json", "status": "FAIL"})
         overall_passed = False

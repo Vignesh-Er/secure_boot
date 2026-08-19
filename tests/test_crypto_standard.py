@@ -6,11 +6,10 @@ specifications and rejects round-3 CRYSTALS-Dilithium artifacts (F-01 guard).
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
 import unicodedata
-import pytest
+from pathlib import Path
 
+import pytest
 from dilithium_py.dilithium import Dilithium3
 from dilithium_py.ml_dsa import ML_DSA_65
 
@@ -19,7 +18,6 @@ from bootsentry.crypto.manifest import Manifest
 from bootsentry.crypto.provider import (
     AlgorithmNotFoundError,
     get_provider,
-    list_supported_algorithms,
 )
 from bootsentry.crypto.verify import verify_manifest
 

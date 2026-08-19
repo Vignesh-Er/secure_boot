@@ -22,13 +22,12 @@ from __future__ import annotations
 
 import json
 import os
-from pathlib import Path
+
 import pytest
 
 from bootsentry.boot.handoff import (
     BootHandoff,
     BootHandoffSecurityError,
-    compute_handoff_mac,
 )
 from bootsentry.crypto.keys import load_public_key, load_secret_key
 from bootsentry.crypto.model_manifest import (

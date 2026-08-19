@@ -56,6 +56,14 @@ def initialize_default_environment(
     keys_dir.mkdir(parents=True, exist_ok=True)
     stages_dir.mkdir(parents=True, exist_ok=True)
 
+    # Copy canonical keys and stages if available to avoid key drift
+    if base != Path("."):
+        import shutil
+        if Path("config/keys").exists() and not (keys_dir / "s0_public.json").exists():
+            shutil.copytree(Path("config/keys"), keys_dir, dirs_exist_ok=True)
+        if Path("config/stages").exists() and not (stages_dir / "s1_manifest.json").exists():
+            shutil.copytree(Path("config/stages"), stages_dir, dirs_exist_ok=True)
+
     # 1. Generate keys if not present
     if not (keys_dir / "s0_public.json").exists():
         generate_all_system_keys(keys_dir, algorithm=default_algorithm)
