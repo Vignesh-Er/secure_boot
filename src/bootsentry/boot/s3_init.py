@@ -81,12 +81,21 @@ def run_stage_3(
     model_manifest_file = models_dir / "model_manifest.json"
     if model_manifest_file.exists():
         try:
+            from bootsentry.crypto.keys import load_public_key
             from bootsentry.crypto.model_manifest import ModelManifest, verify_model_manifest
 
             m_manifest = ModelManifest.load(model_manifest_file)
-            # Verify internal signature and file digests on disk
-            verify_model_manifest(m_manifest, models_dir=models_dir)
+            s3_pub_file = keys_path / "s3_public.json"
+            expected_pk = None
+            if s3_pub_file.exists():
+                _, _, expected_pk = load_public_key(s3_pub_file)
 
+            # G5: Verify signature against pinned key and check file digests BEFORE loading models
+            verify_model_manifest(
+                m_manifest,
+                models_dir=models_dir,
+                expected_public_key_bytes=expected_pk,
+            )
 
             # Extend PCR[3] with model composite digest
             pcr_bank.extend(3, m_manifest.composite_model_digest)

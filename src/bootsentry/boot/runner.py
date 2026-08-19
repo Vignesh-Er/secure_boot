@@ -108,6 +108,10 @@ def execute_boot_chain(
     service_sequence: list[str] | None = None,
 ) -> BootExecutionResult:
     """Execute the complete 4-stage boot chain (S0 -> S1 -> S2 -> S3)."""
+    import os
+    if "BOOTSENTRY_BOOT_SECRET" not in os.environ:
+        os.environ["BOOTSENTRY_BOOT_SECRET"] = os.urandom(32).hex()
+
     t0 = time.perf_counter_ns()
     bid = boot_id or str(uuid.uuid4())
     run_path = Path(run_dir) / bid

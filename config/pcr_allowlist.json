@@ -1,0 +1,13 @@
+{
+  "allowlisted_composites": [
+    "7858110bcd6f44ac86ece8bb1e285661eed17e7fbc3b092d2ae41e05bbcb758e"
+  ],
+  "allowlisted_pcrs": [
+    {
+      "PCR0": "c261a02324cb3c5cd241cf11a46ba6c879237f8094d4540053fe257aad8642ab",
+      "PCR1": "503f4b8d0f36219d61ac92ed30c3b34dc3a894ef3067c6c40aa8935bd04a6272",
+      "PCR2": "47c9e707b37070da7bb341186b62d6d4e1313ce2925a4055dfe1ecca3dd1ca0d",
+      "PCR3": "5e3967652272ddc78ad67c92812efc5863349b31c38a6922d88cb2ec41cf357a"
+    }
+  ]
+}

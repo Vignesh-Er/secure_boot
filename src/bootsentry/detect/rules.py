@@ -7,6 +7,8 @@ AI / ML anomaly scores never override or weaken these rules.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import json
+from pathlib import Path
 from typing import Any
 
 from bootsentry.telemetry.record import BootRecord
@@ -20,18 +22,56 @@ class RuleCheckResult:
     details: dict[str, Any] = field(default_factory=dict)
 
 
+def load_default_svn_floor(config_path: Path | str = "config/svn_floor.json") -> dict[str, int]:
+    """Load per-stage SVN floor configuration."""
+    p = Path(config_path)
+    if p.exists():
+        try:
+            with open(p, encoding="utf-8") as f:
+                data = json.load(f)
+            return data.get("min_svn", {})
+        except Exception:
+            pass
+    return {"S1": 1, "S2": 5, "S3": 1}
+
+
+def load_default_pcr_allowlist(config_path: Path | str = "config/pcr_allowlist.json") -> set[str]:
+    """Load allowlisted PCR composite digests."""
+    p = Path(config_path)
+    if p.exists():
+        try:
+            with open(p, encoding="utf-8") as f:
+                data = json.load(f)
+            return set(data.get("allowlisted_composites", []))
+        except Exception:
+            pass
+    return set()
+
+
 class DeterministicRuleFloor:
     """Evaluates non-negotiable deterministic security rules."""
 
     def __init__(
         self,
-        min_trusted_svn: int = 5,
+        min_trusted_svn: int | dict[str, int] = 5,
         allowlisted_pcrs: set[str] | None = None,
         required_stages: list[str] | None = None,
     ):
-        self.min_trusted_svn = min_trusted_svn
-        self.allowlisted_pcrs = allowlisted_pcrs or set()
+        if isinstance(min_trusted_svn, dict):
+            self.svn_floor_map = min_trusted_svn
+            self.default_min_svn = 1
+        else:
+            self.svn_floor_map = load_default_svn_floor()
+            self.default_min_svn = min_trusted_svn
+
+        self.allowlisted_pcrs = allowlisted_pcrs if allowlisted_pcrs is not None else load_default_pcr_allowlist()
         self.required_stages = required_stages or ["S0", "S1", "S2", "S3"]
+
+    def get_min_svn(self, stage_id: str | None = None) -> int:
+        """Resolve minimum trusted SVN for a given stage."""
+        if stage_id and stage_id in self.svn_floor_map:
+            return self.svn_floor_map[stage_id]
+        return self.default_min_svn
 
     def evaluate(
         self,
@@ -47,13 +87,16 @@ class DeterministicRuleFloor:
         details = {}
 
         # Rule 1: Security Version Counter (SVN) Rollback Check
-        if observed_svn is not None and observed_svn < self.min_trusted_svn:
-            triggered.append("RULE_SVN_ROLLBACK")
-            reasons.append(
-                f"Security Version Rollback detected: observed SVN={observed_svn} < trusted minimum SVN={self.min_trusted_svn}"
-            )
-            details["observed_svn"] = observed_svn
-            details["min_trusted_svn"] = self.min_trusted_svn
+        if observed_svn is not None:
+            stage = manifest_stage_id or expected_stage_id
+            min_svn = self.get_min_svn(stage)
+            if observed_svn < min_svn:
+                triggered.append("RULE_SVN_ROLLBACK")
+                reasons.append(
+                    f"Security Version Rollback detected: observed SVN={observed_svn} < trusted minimum SVN={min_svn}"
+                )
+                details["observed_svn"] = observed_svn
+                details["min_trusted_svn"] = min_svn
 
         # Rule 2: Allowlisted PCR Check (if allowlist configured)
         if (
@@ -74,7 +117,6 @@ class DeterministicRuleFloor:
                 f"Stage ID mismatch: manifest declares '{manifest_stage_id}', executing as '{expected_stage_id}'"
             )
 
-
         # Rule 4: Crypto Status Check (from Gate 1)
         if record.crypto_status not in ("PASS", "COMPLETED"):
             triggered.append("RULE_CRYPTO_VERIFICATION_FAILED")
@@ -84,7 +126,6 @@ class DeterministicRuleFloor:
         if record.measurement_status not in ("PASS", "COMPLETED"):
             triggered.append("RULE_MEASUREMENT_VERIFICATION_FAILED")
             reasons.append("Measured boot state verification failed at Gate 2")
-
 
         passed = len(triggered) == 0
         return RuleCheckResult(
